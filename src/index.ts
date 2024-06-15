@@ -1,24 +1,31 @@
-// Import
+// ! IMPORTS
 import { Elysia } from "elysia";
 import cors from "@elysiajs/cors";
-import { PrismaClient } from '@prisma/client'
 import { swagger } from '@elysiajs/swagger'
 import { auth } from "./routes/auth.routes";
-
-const db = new PrismaClient() 
+import { checkApiKey } from "./plugins/checkApiKey";
 
 
 // Variable
 // Get Port form .env
 const port = process.env.PORT!;
 
-
+// ! INSTANCE 
 const app = new Elysia()
-  .use(swagger({provider: "swagger-ui", documentation: {
-    tags: [
-      { name: 'Auth', description: 'Authentication request' },
-    ]
-  }})) 
+
+  // ! SWAGGER
+  .use(swagger({
+    provider: "swagger-ui", documentation: {
+      tags: [
+        { name: 'Auth', description: 'Authentication request' },
+      ]
+    }
+  }))
+
+  // ! API KEY
+  .use(checkApiKey)
+
+  // ! CORS
   .use(
     cors({
       origin: "*",
@@ -26,7 +33,7 @@ const app = new Elysia()
       allowedHeaders: [
         "Content-Type",
         "Authorization",
-        "api-key",
+        "x-api-key",
         "accept",
         "origin",
         "x-requested-with",
@@ -34,11 +41,17 @@ const app = new Elysia()
     }),
   )
 
+  // ! HELLO WORLD !
   .get("/", () => "Hello Elysia")
+
+  // ! GROUP ROUTES
   .group('/api', (app) =>
+
+    // - Auth routes
     app.use(auth),
   )
-  
+
+  // ! RUN SERVER
   .listen(port);
 
 console.log(
