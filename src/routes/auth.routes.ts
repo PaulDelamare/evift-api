@@ -88,7 +88,8 @@ export const auth = new Elysia({ prefix: "/auth" })
       body: 'login',
       // Detail for swagger
       detail: {
-        tags: ['Auth']
+        tags: ['Auth'],
+        summary: 'For login register'
       }
     }
   )
@@ -116,7 +117,8 @@ export const auth = new Elysia({ prefix: "/auth" })
       body: 'user',
       //- Detail for swagger
       detail: {
-        tags: ['Auth']
+        tags: ['Auth'],
+        summary: 'For login user'
       }
     })
   // .use(authPlugin)
@@ -129,4 +131,10 @@ export const auth = new Elysia({ prefix: "/auth" })
 
     // Return user
     return user
-  })
+  },
+    {
+      detail: {
+        tags: ['Auth'],
+        summary: 'Get current user information if is logged'
+      }
+    })
