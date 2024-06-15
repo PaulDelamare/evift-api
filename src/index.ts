@@ -1,6 +1,12 @@
 // Import
 import { Elysia } from "elysia";
 import cors from "@elysiajs/cors";
+import { PrismaClient } from '@prisma/client'
+import { swagger } from '@elysiajs/swagger'
+import { auth } from "./routes/auth.routes";
+
+const db = new PrismaClient() 
+
 
 // Variable
 // Get Port form .env
@@ -8,6 +14,11 @@ const port = process.env.PORT!;
 
 
 const app = new Elysia()
+  .use(swagger({provider: "swagger-ui", documentation: {
+    tags: [
+      { name: 'Auth', description: 'Authentication request' },
+    ]
+  }})) 
   .use(
     cors({
       origin: "*",
@@ -22,7 +33,12 @@ const app = new Elysia()
       ],
     }),
   )
+
   .get("/", () => "Hello Elysia")
+  .group('/api', (app) =>
+    app.use(auth),
+  )
+  
   .listen(port);
 
 console.log(

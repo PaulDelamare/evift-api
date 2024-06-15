@@ -3,14 +3,24 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "migrate": "bunx prisma migrate dev --name init"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.0.2",
-    "elysia": "latest"
+    "@elysiajs/jwt": "^1.0.2",
+    "@elysiajs/swagger": "^1.0.5",
+    "@prisma/client": "5.15.0",
+    "elysia": "latest",
+    "handlebars": "^4.7.8",
+    "nodemailer": "^6.9.13",
+    "pg": "^8.12.0"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "@types/nodemailer": "^6.4.15",
+    "@types/pg": "^8.11.6",
+    "bun-types": "latest",
+    "prisma": "^5.15.0"
   },
   "module": "src/index.js",
   "bun-create": {
