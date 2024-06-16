@@ -12,11 +12,10 @@ const checkApiKey = (app: Elysia) =>
      app
           .onBeforeHandle(({ headers, set }) => {
                const apiKeyHeader = headers["x-api-key"];
-               if (apiKeyHeader === Bun.env.API_KEY) {
-               } else {
+               if (apiKeyHeader !== Bun.env.API_KEY) {
                     // handle error for user not found from the provided access token
                     set.status = "Forbidden";
-                    throw new Error("La clef api ets invalide");
+                    return { status: 401 ,error: "La clef api est invalide" };
                }
           });
 
