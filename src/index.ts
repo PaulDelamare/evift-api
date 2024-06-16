@@ -21,6 +21,8 @@ const app = new Elysia()
       ]
     }
   }))
+    // ! HELLO WORLD !
+    .get("/", ({headers}) =>{ console.log(headers);return {name: "Hello Elysia"}})
 
   // ! API KEY
   .use(checkApiKey)
@@ -40,9 +42,6 @@ const app = new Elysia()
       ],
     }),
   )
-
-  // ! HELLO WORLD !
-  .get("/", () => "Hello Elysia")
 
   // ! GROUP ROUTES
   .group('/api', (app) =>
