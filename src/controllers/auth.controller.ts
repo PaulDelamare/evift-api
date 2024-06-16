@@ -106,7 +106,7 @@ export class AuthController {
             // Return Success message 
             return {
                 status: 201,
-                error: "Utilisateur enregisté avec succès !"
+                message: "Utilisateur enregisté avec succès !"
             }
 
             // ? If an error occur
