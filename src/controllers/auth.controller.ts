@@ -76,7 +76,7 @@ export class AuthController {
      * @return - A promise that resolves to an object with the status code and message.
      * @throws - If an error occurs during the registration process.
      */
-    public async register(body: User) {
+    public async register(body: {firstname: string; lastname: string; email: string; password: string}) {
 
         //? Try Create User in Database
         try {
