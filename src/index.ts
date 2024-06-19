@@ -25,7 +25,6 @@ const app = new Elysia()
   )
   // ! HELLO WORLD !
   .get("/", ({ headers }) => {
-    console.log(headers);
     return { name: "Hello Elysia" };
   })
 
@@ -51,9 +50,12 @@ const app = new Elysia()
   // ! GROUP ROUTES
   .group("/api", (app) =>
     // - Auth routes
+    // Auth route
     app.use(auth)
-        .use(user)
-        .use(invite)
+      // User route
+      .use(user)
+      // Invitation route
+      .use(invite)
   )
 
   // ! RUN SERVER

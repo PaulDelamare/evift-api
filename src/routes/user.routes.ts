@@ -1,7 +1,6 @@
 // ! IMPORTS
 import { Elysia, t } from "elysia";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
-
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
 import { UserController } from "../controllers/user.controller";
 
@@ -28,13 +27,15 @@ export const user = new Elysia({ prefix: "/user" })
     // ? Use Plugin for check if user is logged
     .use(authPlugin)
 
-        // ! ROUTES
+    // ! ROUTES
 
     // ? Get user by email
     .get(
+        // - Path
         "/findUser/:email",
+
+        // - Function
         async ({ userController, params: { email }, set }) => {
-            console.log(email);
 
             // get Response from register method
             const response = await userController.findByEmail(email);
@@ -45,7 +46,10 @@ export const user = new Elysia({ prefix: "/user" })
             // Return response
             return response;
         },
+
+        // - VALIDATION
         {
+            // Params must be an email
             params: t.Object({
                 email: t.String({
                     format: "email",

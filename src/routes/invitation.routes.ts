@@ -2,11 +2,10 @@
 import { Elysia, t } from "elysia";
 import { InvitationController } from "../controllers/invitation.controller";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
-
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
 import { User } from "../models/User";
 
-// Create Invittaion Route
+// Create Invitaion Route
 export const invite = new Elysia({ prefix: "/invitation" })
     // ! CONFIGURATION
     // Declare controller Class
@@ -32,11 +31,16 @@ export const invite = new Elysia({ prefix: "/invitation" })
 
     // ? Post request friends invitation
     .post(
+        // - Path
         "/request",
+
+        // - Function
         async ({ body, set, invitationController, user }) => {
+
+            // Define user as User type
             const userData = user! as User;
 
-            // get Response from register method
+            // get Response from invitationController
             const response = await invitationController.invitationUser(
                 body,
                 userData.id
@@ -48,7 +52,10 @@ export const invite = new Elysia({ prefix: "/invitation" })
             // Return response
             return response;
         },
+
+        // - VALIDATION
         {
+            // Body must have id with format uuid
             body: t.Object({
                 id: t.String({
                     format: "uuid",

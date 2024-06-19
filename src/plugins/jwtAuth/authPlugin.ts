@@ -16,7 +16,6 @@ const authPlugin = (app: Elysia) =>
         .use(jwtConfig)
 
         .derive(async ({ jwt, cookie: { accessToken }, set }) => {
-            console.log(accessToken.value)
 
             // Verify access token
             if (!accessToken.value) {

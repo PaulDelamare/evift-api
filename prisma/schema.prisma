@@ -13,6 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User model
 model User {
   id         String       @id @unique @default(uuid())
   email      String       @unique
@@ -27,6 +28,7 @@ model User {
   friend2    Friends[]    @relation("friend2")
 }
 
+// Invitation model (Friends Request)
 model Invitation {
   id        String   @id @unique @default(uuid())
   user      User     @relation("invitation", fields: [userId], references: [id])
@@ -38,6 +40,7 @@ model Invitation {
   createdAt DateTime @default(now())
 }
 
+// Friends
 model Friends {
   id         String   @id @unique @default(uuid())
   user       User     @relation("friend1", fields: [user1Id], references: [id])
