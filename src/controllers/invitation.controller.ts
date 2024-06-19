@@ -15,69 +15,12 @@ export class InvitationController {
         this.bdd = new PrismaClient();
     }
 
-    // ! LOGIN
-    public async fi(body: { email: string; password: string }) {
-        // - Try Request
-        try {
-            // Find User in Database with Email
-            const user = await this.bdd.user.findUnique({
-                where: { email: body.email },
-                select: {
-                    id: true,
-                    email: true,
-                    password: true,
-                    firstname: true,
-                    lastname: true,
-                },
-            });
-
-            // Return Error if User not found
-            if (!user) {
-                return {
-                    status: 400,
-                    error: "L'adresse email ou le mot de passe est incorrect",
-                };
-            }
-
-            // Check if Password match
-            const matchPassword = await Bun.password.verify(
-                body.password,
-                user.password
-            );
-
-            // Return Error if Password not match
-            if (!matchPassword) {
-                return {
-                    status: 400,
-                    error: "L'adresse email ou le mot de passe est incorrect",
-                };
-            }
-
-            // Remove password from user
-            const { password, ...userWithoutPassword } = user;
-
-            // Return Success message
-            return {
-                status: 200,
-                data: userWithoutPassword,
-            };
-        } catch (error) {
-            // - Catch Error
-            // Return Error Server
-            return errorServer(
-                error,
-                "Une erreur s'est produite lors de la création de l'utilisateur"
-            );
-        }
-    }
-
     // ! Request Invitation
     /**
-     * Request Invitation
+     * Request an invitation for a user.
      *
-     * @param body - The user object containing the email, firstname, lastname, and password.
-     * @return - A promise that resolves to an object with the status code and message.
-     * @throws - If an error occurs during the registration process.
+     * @param body - An object containing the user id for the invitation and the current user's id.
+     * @return A promise that resolves to an object with the status code and message.
      */
     public async invitationUser(body: { id: string }, userId: string) {
         if (body.id === userId) {
