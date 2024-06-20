@@ -56,5 +56,9 @@ export const user = new Elysia({ prefix: "/user" })
                     error: "L'adresse email est invalide",
                 }),
             }),
+            detail: {
+                tags: ['User'],
+                summary: 'Find an user by email'
+            }
         }
     );
