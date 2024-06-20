@@ -16,16 +16,15 @@ const authPlugin = (app: Elysia) =>
         .use(jwtConfig)
 
         .derive(async ({ jwt, cookie: { accessToken }, set }) => {
-
+            
             // Verify access token
             if (!accessToken.value) {
+
+                console.log('here')
                 // handle error for access token is not available
                 set.status = 401;
-                
-                return {
-                    status: 401,
-                    error: "Vous devez vous authentifier",
-                }
+
+                throw new Error("Vous devez vous authentifier");
             }
 
             // Verify access token
@@ -34,10 +33,8 @@ const authPlugin = (app: Elysia) =>
                 // handle error for access token is tempted or incorrect
                 set.status = 403;
                 // throw new Error("Accès invalide");
-                return {
-                    status: 403,
-                    error: "Accés invalide",
-                }
+
+                throw new Error("Accès invalide");
             }
 
             // Find user from access token
@@ -52,10 +49,7 @@ const authPlugin = (app: Elysia) =>
             if (!user) {
                 // handle error for user not found from the provided access token
                 set.status = 403;
-                return {
-                    status: 403,
-                    error: "Access token est invalide",
-                }
+                throw new Error("Access token est invalide");
             }
 
             // Return user
