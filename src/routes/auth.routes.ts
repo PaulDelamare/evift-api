@@ -102,7 +102,6 @@ export const auth = new Elysia({ prefix: "/auth" })
     "/register",
     // CONTROLLER
     async ({ authController, body, set }) => {
-      console.log(body)
 
       // get Response from register method
       const response = await authController.register(body);
@@ -131,7 +130,6 @@ export const auth = new Elysia({ prefix: "/auth" })
 
   // ? Get current user
   .get('/me', ({ user }) => {
-    console.log(user)
 
     // Return user
     return user
