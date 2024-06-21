@@ -274,4 +274,32 @@ export class InvitationController {
             return errorServer(error, "Une erreur s'est produite lors de la recherche des invitations");
         }
     }
+
+    /**
+     * Asynchronously counts the number of invitations for a given user.
+     * 
+     * @param userId - The unique identifier of the user to count invitations for.
+     * @returns An object containing the status and the count of invitations.
+     */
+    public async countInvitations(userId: string) {
+
+        // - Try Request
+        try {
+
+            // Get number of friends Invitation
+            const count = await this.bdd.invitation.count({
+                where: {
+                    requestId: userId
+                }
+            });
+
+            // Return number 
+            return { status: 200, data: count };
+        }
+        // - Catch Error
+        catch (error) {
+            // Return Error Server
+            return errorServer(error, "Une erreur s'est produite lors de la recherche des invitations");
+        }
+    }
 }
