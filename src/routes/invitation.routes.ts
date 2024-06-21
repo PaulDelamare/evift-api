@@ -147,3 +147,33 @@ export const invite = new Elysia({ prefix: "/invitation" })
             }
         }
     )
+
+    // ? Count all Friends Request for our account
+    .get(
+        // - Path
+        "/count",
+
+        // - Function
+        async ({ body, set, invitationController, user }) => {
+
+            // Define user as User type
+            const userData = user! as User; 
+
+            // get Response from invitationController
+            const response = await invitationController.countInvitations(userData.id);
+
+            // Set status with status Reponse
+            set.status = response.status;
+
+            // Return response
+            return response;
+        },
+
+        // - VALIDATION
+        {
+            detail: {
+                tags: ['Invitation'],
+                summary: 'Send request for add friend to an other user'
+            }
+        }
+    )
