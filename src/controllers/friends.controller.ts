@@ -28,7 +28,7 @@ export class FriendsController {
         try {
 
             // Get all Friends
-            const friends =  await this.bdd.friends.findMany({
+            const friends = await this.bdd.friends.findMany({
                 where: {
                     OR: [
                         {
@@ -60,11 +60,29 @@ export class FriendsController {
                 }
             })
 
+            // Map friends to new array with modified objects
+            const mappedFriends = friends.map(friend => {
+                if (friend.user1Id === id) {
+                    return {
+                        id: friend.id,
+                        createdAt: friend.created_at,
+                        userId: friend.user2.id,
+                        user: friend.user2
+                    };
+                } else if (friend.user2Id === id) {
+                    return {
+                        id: friend.id,
+                        createdAt: friend.created_at,
+                        userId: friend.user.id,
+                        user: friend.user
+                    };
+                }
+            });
 
             // Return Friends
             return {
                 status: 200,
-                data: friends,
+                data: mappedFriends,
             };
 
         }

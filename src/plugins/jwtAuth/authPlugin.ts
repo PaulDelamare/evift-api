@@ -20,7 +20,6 @@ const authPlugin = (app: Elysia) =>
             // Verify access token
             if (!accessToken.value) {
 
-                console.log('here')
                 // handle error for access token is not available
                 set.status = 401;
 
@@ -43,6 +42,7 @@ const authPlugin = (app: Elysia) =>
                 where: {
                     id: userId,
                 },
+                select: { id: true, email: true, firstname: true, lastname: true, createdAt: true },
             });
 
             // Verify user
