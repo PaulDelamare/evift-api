@@ -26,28 +26,59 @@ model User {
   request    Invitation[]
   friend1    Friends[]    @relation("friend1")
   friend2    Friends[]    @relation("friend2")
+  userEvent  Event[]
 }
 
 // Invitation model (Friends Request)
 model Invitation {
-  id        String   @id @unique @default(uuid())
-  user      User     @relation("invitation", fields: [userId], references: [id])
-  userId    String 
-  
-  request   User     @relation(fields: [requestId], references: [id])
+  id     String @id @unique @default(uuid())
+  user   User   @relation("invitation", fields: [userId], references: [id])
+  userId String
+
+  request   User   @relation(fields: [requestId], references: [id])
   requestId String
-  
+
   createdAt DateTime @default(now())
 }
 
 // Friends
 model Friends {
-  id         String   @id @unique @default(uuid())
-  user       User     @relation("friend1", fields: [user1Id], references: [id])
-  user1Id    String
-  
-  user2      User     @relation("friend2", fields: [user2Id], references: [id])
-  user2Id    String
-  
+  id      String @id @unique @default(uuid())
+  user    User   @relation("friend1", fields: [user1Id], references: [id])
+  user1Id String
+
+  user2   User   @relation("friend2", fields: [user2Id], references: [id])
+  user2Id String
+
   created_at DateTime @default(now())
+}
+
+model RoleEvent {
+  id          String        @id @unique @default(uuid())
+  name        String        @unique
+  createdAt   DateTime      @default(now())
+  participant Participant[]
+}
+
+model Event {
+  id          String        @id @unique @default(uuid())
+  name        String
+  description String
+  address     String
+  date        DateTime
+  img         String
+  user        User          @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  event       Participant[]
+}
+
+model Participant {
+  id String @id @unique @default(uuid())
+
+  event    Event     @relation(fields: [id_event], references: [id])
+  id_event String
+  roleRef  RoleEvent @relation(fields: [id_role], references: [id])
+  id_role  String
 }
