@@ -131,6 +131,7 @@ export const auth = new Elysia({ prefix: "/auth" })
   // ? Get current user
   .get('/me', ({ user }) => {
 
+
     // Return user
     return user
   },
