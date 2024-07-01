@@ -52,11 +52,10 @@ export const event = new Elysia({ prefix: "/event" })
                );
 
                // Set status with status Reponse
-               // set.status = response.status;
-               set.status = 200;
+               set.status = response.status;
 
                // Return response
-               return {test: 'ouaius ouais ouais'};
+               return response;
           },
 
           // - VALIDATION
