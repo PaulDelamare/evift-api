@@ -15,18 +15,20 @@ datasource db {
 
 // User model
 model User {
-  id         String       @id @unique @default(uuid())
-  email      String       @unique
-  firstname  String
-  lastname   String
-  password   String
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  invitation Invitation[] @relation("invitation")
-  request    Invitation[]
-  friend1    Friends[]    @relation("friend1")
-  friend2    Friends[]    @relation("friend2")
-  userEvent  Event[]
+  id                  String            @id @unique @default(uuid())
+  email               String            @unique
+  firstname           String
+  lastname            String
+  password            String
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  invitation          Invitation[]      @relation("invitation")
+  request             Invitation[]
+  friend1             Friends[]         @relation("friend1")
+  friend2             Friends[]         @relation("friend2")
+  userEvent           Event[]
+  userEventInvitation EventInvitation[] @relation("userEventInvitation")
+  userEventOrganizer  EventInvitation[] @relation("userEventOrganizer")
 }
 
 // Invitation model (Friends Request)
@@ -61,17 +63,18 @@ model RoleEvent {
 }
 
 model Event {
-  id          String        @id @unique @default(uuid())
+  id          String            @id @unique @default(uuid())
   name        String
   description String
   address     String
   date        DateTime
   img         String
-  user        User          @relation(fields: [userId], references: [id])
+  user        User              @relation(fields: [userId], references: [id])
   userId      String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   event       Participant[]
+  invitation  EventInvitation[]
 }
 
 model Participant {
@@ -81,4 +84,17 @@ model Participant {
   id_event String
   roleRef  RoleEvent @relation(fields: [id_role], references: [id])
   id_role  String
+}
+
+model EventInvitation {
+  id String @id @unique @default(uuid())
+
+  event    Event  @relation(fields: [id_event], references: [id])
+  id_event String
+
+  idUser  User   @relation("userEventInvitation", fields: [id_user], references: [id])
+  id_user String
+
+  idOrganizer       User @relation("userEventOrganizer", fields: [id_organizer], references: [id])
+  id_organizer String
 }
