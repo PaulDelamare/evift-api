@@ -29,6 +29,7 @@ model User {
   userEvent           Event[]
   userEventInvitation EventInvitation[] @relation("userEventInvitation")
   userEventOrganizer  EventInvitation[] @relation("userEventOrganizer")
+  userParticipant  Participant[] 
 }
 
 // Invitation model (Friends Request)
@@ -82,8 +83,15 @@ model Participant {
 
   event    Event     @relation(fields: [id_event], references: [id])
   id_event String
+  
   roleRef  RoleEvent @relation(fields: [id_role], references: [id])
   id_role  String
+
+  user User     @relation(fields: [id_user], references: [id])
+  id_user String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model EventInvitation {
