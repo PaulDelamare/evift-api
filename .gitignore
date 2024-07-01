@@ -45,3 +45,5 @@ bun.lockb
 
 # Prisma
 prisma/migrations/*
+
+uploads/*

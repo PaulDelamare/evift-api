@@ -37,8 +37,6 @@ export const friends = new Elysia({ prefix: "/friends" })
         // - Function
         async ({ body, set, friendsController, user }) => {
 
-            console.log(user)
-
             // Define user as User type
             const userData = user! as User;
 

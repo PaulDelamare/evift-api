@@ -15,39 +15,94 @@ datasource db {
 
 // User model
 model User {
-  id         String       @id @unique @default(uuid())
-  email      String       @unique
-  firstname  String
-  lastname   String
-  password   String
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  invitation Invitation[] @relation("invitation")
-  request    Invitation[]
-  friend1    Friends[]    @relation("friend1")
-  friend2    Friends[]    @relation("friend2")
+  id                  String            @id @unique @default(uuid())
+  email               String            @unique
+  firstname           String
+  lastname            String
+  password            String
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  invitation          Invitation[]      @relation("invitation")
+  request             Invitation[]
+  friend1             Friends[]         @relation("friend1")
+  friend2             Friends[]         @relation("friend2")
+  userEvent           Event[]
+  userEventInvitation EventInvitation[] @relation("userEventInvitation")
+  userEventOrganizer  EventInvitation[] @relation("userEventOrganizer")
+  userParticipant  Participant[] 
 }
 
 // Invitation model (Friends Request)
 model Invitation {
-  id        String   @id @unique @default(uuid())
-  user      User     @relation("invitation", fields: [userId], references: [id])
-  userId    String 
-  
-  request   User     @relation(fields: [requestId], references: [id])
+  id     String @id @unique @default(uuid())
+  user   User   @relation("invitation", fields: [userId], references: [id])
+  userId String
+
+  request   User   @relation(fields: [requestId], references: [id])
   requestId String
-  
+
   createdAt DateTime @default(now())
 }
 
 // Friends
 model Friends {
-  id         String   @id @unique @default(uuid())
-  user       User     @relation("friend1", fields: [user1Id], references: [id])
-  user1Id    String
-  
-  user2      User     @relation("friend2", fields: [user2Id], references: [id])
-  user2Id    String
-  
+  id      String @id @unique @default(uuid())
+  user    User   @relation("friend1", fields: [user1Id], references: [id])
+  user1Id String
+
+  user2   User   @relation("friend2", fields: [user2Id], references: [id])
+  user2Id String
+
   created_at DateTime @default(now())
+}
+
+model RoleEvent {
+  id          String        @id @unique @default(uuid())
+  name        String        @unique
+  createdAt   DateTime      @default(now())
+  participant Participant[]
+}
+
+model Event {
+  id          String            @id @unique @default(uuid())
+  name        String
+  description String
+  address     String
+  date        DateTime
+  img         String
+  user        User              @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  event       Participant[]
+  invitation  EventInvitation[]
+}
+
+model Participant {
+  id String @id @unique @default(uuid())
+
+  event    Event     @relation(fields: [id_event], references: [id])
+  id_event String
+  
+  roleRef  RoleEvent @relation(fields: [id_role], references: [id])
+  id_role  String
+
+  user User     @relation(fields: [id_user], references: [id])
+  id_user String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EventInvitation {
+  id String @id @unique @default(uuid())
+
+  event    Event  @relation(fields: [id_event], references: [id])
+  id_event String
+
+  idUser  User   @relation("userEventInvitation", fields: [id_user], references: [id])
+  id_user String
+
+  idOrganizer       User @relation("userEventOrganizer", fields: [id_organizer], references: [id])
+  id_organizer String
 }

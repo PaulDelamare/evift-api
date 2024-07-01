@@ -7,7 +7,7 @@ export class FriendsController {
     // ! Class Variable
     private readonly bdd: PrismaClient;
 
-    // ! Constrcutor
+    // ! Constructor
     constructor() {
         // Bdd Instance
         this.bdd = new PrismaClient();
@@ -92,7 +92,7 @@ export class FriendsController {
             // Return Error Server
             return errorServer(
                 error,
-                "Une erreur s'est produite lors de la création de l'utilisateur"
+                "Une erreur s'est produite lors de la récupération des amis"
             );
         }
     }
