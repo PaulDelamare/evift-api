@@ -1,19 +1,20 @@
 // ! IMPORTS
 import { errorServer } from "../lib/utils/errorServer";
 import { PrismaClient } from "@prisma/client";
+import { formatFileName } from "../lib/utils/formatFileName";
 
 // ! CLASS
 export class EventController {
     // ! Class Variable
     private readonly bdd: PrismaClient;
 
-    // ! Constrcutor
+    // ! Constructor
     constructor() {
         // Bdd Instance
         this.bdd = new PrismaClient();
     }
 
-    // ! Find All Friends
+    // ! Create new event
     /**
      * Create new event
      *
@@ -26,13 +27,34 @@ export class EventController {
         //? Try Create User in Database
         try {
 
+            // Define imgPath
+            let imgPath = '';
+            // If there are an image
+            if (body.img) {
 
+                // Format File Name
+                imgPath = await formatFileName(body.img, './uploads/events/');
 
+                // Write File 
+                await Bun.write(imgPath, body.img);
+            }
 
-            // Return Friends
+            // Create Event
+            const newEvent = await this.bdd.event.create({
+                data: {
+                    name: body.name,
+                    description: body.description,
+                    date: body.date,
+                    address: body.address,
+                    img: imgPath,
+                    user: { connect: { id } },
+                },
+            });
+
+            // Return Event id
             return {
-                status: 200,
-                data: '',
+                status: 201,
+                data: newEvent.id,
             };
 
         }
@@ -42,7 +64,7 @@ export class EventController {
             // Return Error Server
             return errorServer(
                 error,
-                "Une erreur s'est produite lors de la création de l'utilisateur"
+                "Une erreur s'est produite lors de l'événement"
             );
         }
     }
