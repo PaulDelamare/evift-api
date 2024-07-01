@@ -51,6 +51,18 @@ export class EventController {
                 },
             });
 
+            // Get admin role
+            const idAdminRole = await this.bdd.roleEvent.findFirst({ where: { name: "admin" } })
+
+            // Create Participant
+            await this.bdd.participant.create({
+                data: {
+                    id_event:  newEvent.id,
+                    id_user: id,
+                    id_role: idAdminRole!.id,
+                }
+            })
+
             // Return Event id
             return {
                 status: 201,
