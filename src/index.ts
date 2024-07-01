@@ -7,6 +7,7 @@ import { user } from "./routes/user.routes";
 import { invite } from "./routes/invitation.routes";
 import {friends} from "./routes/friends.routes";
 import {event} from "./routes/event.routes";
+import {rolesEvent} from "./routes/rolesEvent.routes";
 import { checkApiKey } from "./plugins/checkApiKey";
 
 // Variable
@@ -66,6 +67,8 @@ const app = new Elysia()
       .use(friends)
       // Events route
       .use(event)
+      // Events roles
+      .use(rolesEvent)
   )
 
   // ! RUN SERVER
