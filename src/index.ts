@@ -26,6 +26,8 @@ const app = new Elysia()
           { name: "Auth", description: "Authentication request" },
           { name: "User", description: "User request" },
           { name: "Invitation", description: "Friends Invitation request" },
+          { name: "Event", description: "All the request link to the event gestion" },
+          { name: "Role", description: "All the request link to the role gestion" },
         ],
       },
     })

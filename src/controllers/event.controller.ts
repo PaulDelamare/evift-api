@@ -16,15 +16,16 @@ export class EventController {
 
     // ! Create new event
     /**
-     * Create new event
+     * Create a new event in the database with the provided information.
      *
-     * @param id - The ID of the user.
-     * @return A promise that resolves to an object with the status code and the list of friends.
-     * If an error occurs, it returns an error server object.
+     * @param - The ID of the user creating the event.
+     * @param - The event details including name, description, date, address, and optional image file.
+     * @return - A promise that resolves to an object containing the status code and the ID of the newly created event.
+     * @throws - If an error occurs during the event creation, an error server object is returned.
      */
     public async create(id: string, body: { name: string; description: string; date: Date; address: string; img?: File | undefined; }) {
 
-        //? Try Create User in Database
+        //? Try Create Event in Database
         try {
 
             // Define imgPath

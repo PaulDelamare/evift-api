@@ -6,7 +6,7 @@ import { User } from "../models/User";
 import { eventModel } from "../models/Event";
 import { EventController } from "../controllers/event.controller";
 
-// Create Invitaion Route
+// Create Event Route
 export const event = new Elysia({ prefix: "/event" })
      // ! CONFIGURATION
      // Declare controller Class
@@ -33,7 +33,7 @@ export const event = new Elysia({ prefix: "/event" })
 
      // ! ROUTES
 
-     // ? Post request friends invitation
+     // ? Post event
      .post(
           // - Path
           "/create",
@@ -45,7 +45,7 @@ export const event = new Elysia({ prefix: "/event" })
                // Define user as User type
                const userData = user! as User;
 
-               // get Response from invitationController
+               // get Response from eventController
                const response = await eventController.create(
                     userData.id,
                     body

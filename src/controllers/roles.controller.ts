@@ -14,26 +14,27 @@ export class RolesController {
      }
 
      // ! Create new role
+
      /**
-      * Create new event
+      * Creates a new role in the database.
       *
-      * @param id - The ID of the user.
-      * @return A promise that resolves to an object with the status code and the list of friends.
-      * If an error occurs, it returns an error server object.
+      * @param name - The name of the role.
+      * @return - A promise that resolves to an object with the status code and a success message.
+      * @throws - If an error occurs during the role creation, an error server object is thrown.
       */
      public async create(name: string) {
 
-          //? Try Create User in Database
+          //? Try Create Role in Database
           try {
 
-               // Create Event
+               // Create Role
                await this.bdd.roleEvent.create({
                     data: {
                          name: name
                     },
                });
 
-               // Return Event id
+               // Return Success
                return {
                     status: 201,
                     data: "Le role a bien été créé !"
