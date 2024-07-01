@@ -10,7 +10,7 @@ export class AuthController {
     // ! Class Variable
     private readonly bdd: PrismaClient;
 
-    // ! Constrcutor 
+    // ! Constructor 
     constructor() {
         // Bdd Instance
         this.bdd = new PrismaClient();

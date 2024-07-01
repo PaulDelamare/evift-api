@@ -7,7 +7,7 @@ export class InvitationController {
     // ! Class Variable
     private readonly bdd: PrismaClient;
 
-    // ! Constrcutor
+    // ! Constructor
     constructor() {
         // Bdd Instance
         this.bdd = new PrismaClient();
@@ -38,6 +38,7 @@ export class InvitationController {
             // - Find User in Database
             const user = await this.bdd.user.findUnique({
                 where: { id: body.id },
+                select: { id: true, email: true, firstname: true, lastname: true, createdAt: true },
             });
 
             // If user not found
@@ -136,7 +137,7 @@ export class InvitationController {
             // Return Error Server
             return errorServer(
                 error,
-                "Une erreur s'est produite lors de la création de l'utilisateur"
+                "Une erreur s'est produite lors de la requête d'une invitation"
             );
         }
     }
@@ -271,7 +272,7 @@ export class InvitationController {
         // - Catch Error
         catch (error) {
             // Return Error Server
-            return errorServer(error, "Une erreur s'est produite lors de la recherche des invitations");
+            return errorServer(error, "Une erreur s'est produite lors de la réponse d'une invitation");
         }
     }
 
@@ -299,7 +300,7 @@ export class InvitationController {
         // - Catch Error
         catch (error) {
             // Return Error Server
-            return errorServer(error, "Une erreur s'est produite lors de la recherche des invitations");
+            return errorServer(error, "Une erreur s'est produite lors de la récupération du nombre de demandes d'amis");
         }
     }
 }
