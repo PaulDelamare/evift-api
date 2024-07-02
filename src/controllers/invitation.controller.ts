@@ -277,6 +277,186 @@ export class InvitationController {
     }
 
     /**
+     * Invites a list of users to an event. The organizer of the event must be an admin and all invited users must be friends of the organizer.
+     * The function checks if the invited users are already in the EventInvitation table.
+     * If all checks pass, the function creates records in the EventInvitation table.
+     *
+     * @param invitationsId - An array of user IDs to invite to the event.
+     * @param organizerId - The ID of the event organizer.
+     * @param eventId - The ID of the event.
+     * @return - A promise that resolves to an object with the status code and either an error message or the created invitations data.
+     */
+    public async eventInvitation(invitationsId: string[], organizerId: string, eventId: string) {
+        try {
+            // Check that the organizer is an admin
+            const organizerEvent = await this.bdd.participant.findFirst({
+                where: {
+                    id_event: eventId,
+                    id_user: organizerId,
+                },
+                include: {
+                    roleRef: true,
+                },
+            })
+
+            // Check that the organizer is an admin
+            if (!organizerEvent || organizerEvent.roleRef.name !== "admin") {
+
+                return { status: 400, error: 'Vous n\'avez pas le droit d\'inviter des utilisateurs' };
+            }
+
+            // Check that none of the invited users have already been invited to the event
+            for (const userId of invitationsId) {
+                const existingParticipant = await this.bdd.participant.findFirst({
+                    where: {
+                        id_event: eventId,
+                        id_user: userId,
+                    },
+                });
+                if (existingParticipant) {
+                    return { status: 400, error: 'Tous les utilisateurs invités ne sont pas autorisés à participer à cet événement' };
+                }
+            }
+
+
+            // Check that all invited users are friends of the organizer
+            for (const userId of invitationsId) {
+                const friend = await this.bdd.friends.findFirst({
+                    where: {
+                        OR: [
+                            { AND: [{ user1Id: organizerId }, { user2Id: userId }] },
+                            { AND: [{ user1Id: userId }, { user2Id: organizerId }] },
+                        ],
+                    },
+                });
+                if (!friend) {
+                    return { status: 400, error: 'Tous les utilisateurs invités ne sont pas vos amis' };
+                }
+            }
+
+            // Check that none of the invited users have already been invited to the event
+            const existingInvitations = await this.bdd.eventInvitation.count({
+                where: {
+                    AND: [
+                        { id_event: eventId },
+                        { id_user: { in: invitationsId } },
+                    ],
+                },
+            });
+            if (existingInvitations > 0) {
+                return { status: 400, error: 'Certains utilisateurs invités ont déjà été invités à cet événement' };
+            }
+
+            // Create invitations
+            const invitationData = invitationsId.map((userId) => ({
+                id_event: eventId,
+                id_user: userId,
+                id_organizer: organizerId,
+            }));
+            const createdInvitations = await this.bdd.eventInvitation.createMany({
+                data: invitationData,
+            });
+
+            return { status: 200, data: createdInvitations };
+        } catch (error) {
+            console.error(error);
+            return { status: 500, error: 'Une erreur est survenue lors de la création des invitations' };
+        }
+    }
+
+    /**
+     * Retrieves the event invitations for a given user.
+     *
+     * @param userId - The ID of the user.
+     * @return - A promise that resolves to an object containing the status code and the invitations data.
+     */
+    public async getEventInvitations(userId: string) {
+        try {
+            // Get invitations for this user
+            const invitations = await this.bdd.eventInvitation.findMany({
+                where: {
+                    // Get invitations for this user
+                    id_user: userId
+                },
+                include: {
+                    // Get user organizer details
+                    idOrganizer: {
+                        select: {
+                            id: true,
+                            firstname: true,
+                            lastname: true,
+                            email: true,
+                        },
+                    },
+                    // Get event details
+                    event: true
+                }
+            })
+
+            // Return invitations
+            return { status: 200, data: invitations }
+        } catch (error) {
+            // Return Error Server
+            console.error(error);
+            return { status: 500, error: 'Une erreur est survenue lors de la création des invitations' };
+        }
+    }
+
+    public async responseEventInvitation(userId: string, eventId: string, response: boolean) {
+        try {
+            // Get invitation
+            const invitation = await this.bdd.eventInvitation.findFirst({
+                where: {
+                    id_user: userId,
+                    id_event: eventId
+                }
+            })
+            if (!invitation) {
+                return { status: 404, error: 'Invitation introuvable' }
+            }
+
+            const event = await this.bdd.event.findFirst({
+                where: {
+                    id: eventId
+                }
+            })
+            if (!event) {
+                return { status: 404, error: 'Event introuvable' }
+            }
+
+            const participantRole = await this.bdd.roleEvent.findFirst({
+                where: {
+                    name: "participant"
+                }
+            })
+
+            if (response) {
+                await this.bdd.participant.create({
+                    data: {
+                        id_event: eventId,
+                        id_user: userId,
+                        id_role: participantRole!.id,
+                    }
+                })
+            }
+
+            await this.bdd.eventInvitation.delete({
+                where: {
+                    id: invitation.id
+                }
+            })
+
+            return { status: 200, message: `Invitation ${response ? 'acceptée' : 'refusée'}` }
+            
+        } catch (error) {
+
+            // Return Error Server
+            console.error(error);
+            return { status: 500, error: 'Une erreur est survenue lors de la création des invitations' };
+        }
+    }
+
+    /**
      * Asynchronously counts the number of invitations for a given user.
      * 
      * @param userId - The unique identifier of the user to count invitations for.
