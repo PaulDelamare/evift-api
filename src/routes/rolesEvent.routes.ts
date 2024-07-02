@@ -4,7 +4,7 @@ import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
 import { RolesController } from "../controllers/roles.controller";
 
-// Create Invitaion Route
+// Create RoleEvent Route
 export const rolesEvent = new Elysia({ prefix: "/rolesEvent" })
      // ! CONFIGURATION
      // Declare controller Class

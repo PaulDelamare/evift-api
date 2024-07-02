@@ -16,7 +16,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         // If Error is an instance of ValidationError
         if (code === "VALIDATION")
             // Throw Error
-            return { status: error.status, error: error };
+            return { status: error.status, error: error.message };
     })
 
     // ? Use jwtConfig
@@ -148,6 +148,129 @@ export const invite = new Elysia({ prefix: "/invitation" })
         }
     )
 
+    // ? Send request for participation in an event
+    .post(
+        // - Path
+        "/requestEvent",
+
+        // - Function
+        async ({ body, set, invitationController, user }) => {
+
+            // Define user as User type
+            const userData = user! as User;
+
+            // get Response from invitationController
+            const response = await invitationController.eventInvitation(
+                body.invitationId,
+                userData.id,
+                body.eventId
+            );
+
+            // Set status with status Reponse
+            set.status = response.status;
+
+            // Return response
+            return response;
+
+
+        },
+        {
+
+            // Body must have id with format uuid
+            body: t.Object({
+                invitationId: t.Array(
+                    t.String({
+                        format: "uuid",
+                        error: "Les ids des utilisateurs sont invalides",
+                    }),
+                ),
+                eventId: t.String({
+                    format: "uuid",
+                    error: "L'id de l'evènement est invalide",
+                }),
+            }),
+            detail: {
+                tags: ['Event'],
+                summary: 'Send request for participation in an event'
+            }
+        }
+    )
+
+    .get(
+        // - Path
+        "/eventInvitation",
+
+        // - Function
+        async ({ set, invitationController, user }) => {
+
+            // Define user as User type
+            const userData = user! as User;
+
+            // get Response from invitationController
+            const response = await invitationController.getEventInvitations(
+                userData.id
+            );
+
+            // Set status with status Reponse
+            set.status = response.status;
+
+            // Return response
+            return response;
+        },
+        {
+
+            // Body must have id with format uuid
+            detail: {
+                tags: ['Event'],
+                summary: 'Get all request for participation in an event'
+            }
+        }
+    )
+
+    // ? Give response for participation in an event
+    .post(
+        // - Path
+        "/responseEventInvitation",
+
+        // - Function
+        async ({ body, set, invitationController, user }) => {
+
+            // Define user as User type
+            const userData = user! as User;
+
+            // get Response from invitationController
+            const response = await invitationController.responseEventInvitation(
+                userData.id,
+                body.eventId,
+                body.response
+            );
+
+            // Set status with status Reponse
+            set.status = response.status;
+
+            // Return response
+            return response;
+        },
+        {
+            // Body must have id event in uuid format and response in boolean
+            body: t.Object({
+                eventId: t.String({
+                    format: "uuid",
+                    error: "L'id de l'evènement est invalide",
+                }),
+                response: t.Boolean({
+                    error: "La réponse doit est true ou false",
+                }),
+            }),
+            // Add this to invitation swagger
+            detail: {
+                tags: ['Event'],
+                summary: 'Give response for participation in an event'
+            }
+        }
+    )
+
+
     // ? Count all Friends Request for our account
     .get(
         // - Path
@@ -157,7 +280,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         async ({ body, set, invitationController, user }) => {
 
             // Define user as User type
-            const userData = user! as User; 
+            const userData = user! as User;
 
             // get Response from invitationController
             const response = await invitationController.countInvitations(userData.id);
