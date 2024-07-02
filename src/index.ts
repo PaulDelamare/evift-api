@@ -5,9 +5,9 @@ import { swagger } from "@elysiajs/swagger";
 import { auth } from "./routes/auth.routes";
 import { user } from "./routes/user.routes";
 import { invite } from "./routes/invitation.routes";
-import {friends} from "./routes/friends.routes";
-import {event} from "./routes/event.routes";
-import {rolesEvent} from "./routes/rolesEvent.routes";
+import { friends } from "./routes/friends.routes";
+import { event } from "./routes/event.routes";
+import { rolesEvent } from "./routes/rolesEvent.routes";
 import { checkApiKey } from "./plugins/checkApiKey";
 
 // Variable
