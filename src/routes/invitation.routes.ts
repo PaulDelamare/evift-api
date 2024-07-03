@@ -171,8 +171,6 @@ export const invite = new Elysia({ prefix: "/invitation" })
 
             // Return response
             return response;
-
-
         },
         {
 
