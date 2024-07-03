@@ -58,7 +58,7 @@ export class EventController {
             // Create Participant
             await this.bdd.participant.create({
                 data: {
-                    id_event:  newEvent.id,
+                    id_event: newEvent.id,
                     id_user: id,
                     id_role: idAdminRole!.id,
                 }
@@ -77,7 +77,33 @@ export class EventController {
             // Return Error Server
             return errorServer(
                 error,
-                "Une erreur s'est produite lors de l'événement"
+                "Une erreur s'est produite lors de la création de l'événement"
+            );
+        }
+    }
+
+    public async getAll() {
+        try {
+            const events = await this.bdd.event.findMany({
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                            firstname: true,
+                            lastname: true
+                        }
+                    }
+                }
+            });
+            return {
+                status: 200,
+                data: events
+            }
+        }catch (error: unknown) {
+            return errorServer(
+                error,
+                "Une erreur s'est produite lors de la récupération des événement"
             );
         }
     }
