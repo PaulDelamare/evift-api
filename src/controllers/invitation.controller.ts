@@ -353,11 +353,13 @@ export class InvitationController {
                 id_user: userId,
                 id_organizer: organizerId,
             }));
-            const createdInvitations = await this.bdd.eventInvitation.createMany({
+
+            await this.bdd.eventInvitation.createMany({
                 data: invitationData,
             });
 
-            return { status: 200, data: createdInvitations };
+            return { status: 200, data: "Invitations envoyées avec succes" };
+
         } catch (error) {
             console.error(error);
             return { status: 500, error: 'Une erreur est survenue lors de la création des invitations' };
