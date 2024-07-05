@@ -404,6 +404,14 @@ export class InvitationController {
         }
     }
 
+    /**
+     * Responds to an event invitation by accepting or declining it.
+     *
+     * @param userId - The ID of the user who received the invitation.
+     * @param eventId - The ID of the event.
+     * @param response - Whether to accept or decline the invitation.
+     * @return An object with the status code and a message indicating whether the invitation was accepted or declined.
+     */
     public async responseEventInvitation(userId: string, eventId: string, response: boolean) {
         try {
             // Get invitation
@@ -470,14 +478,25 @@ export class InvitationController {
         try {
 
             // Get number of friends Invitation
-            const count = await this.bdd.invitation.count({
+            const countFriendsInvitation = await this.bdd.invitation.count({
                 where: {
                     requestId: userId
                 }
             });
 
+            const countEventInvitation = await this.bdd.eventInvitation.count({
+                where: {
+                    id_user: userId
+                }
+            });
+
+            const notification = {
+                countFriendsInvitation: countFriendsInvitation,
+                countEventInvitation: countEventInvitation
+            }
+
             // Return number 
-            return { status: 200, data: count };
+            return { status: 200, data: notification };
         }
         // - Catch Error
         catch (error) {
