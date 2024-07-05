@@ -1,5 +1,5 @@
 // ! IMPORTS
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import cors from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { auth } from "./routes/auth.routes";
@@ -9,6 +9,7 @@ import { friends } from "./routes/friends.routes";
 import { event } from "./routes/event.routes";
 import { rolesEvent } from "./routes/rolesEvent.routes";
 import { checkApiKey } from "./plugins/checkApiKey";
+// For access to the static files
 
 // Variable
 // Get Port form .env
@@ -32,6 +33,14 @@ const app = new Elysia()
       },
     })
   )
+
+  // ! IMAGE
+  // Get the image
+  .get('/image', ({ query }) => Bun.file(query.name), {
+    query: t.Object({
+      name: t.String()
+    })
+  })
   // ! HELLO WORLD !
   .get("/", ({ headers }) => {
     return { name: "Hello Elysia" };
