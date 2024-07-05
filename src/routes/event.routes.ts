@@ -74,8 +74,11 @@ export const event = new Elysia({ prefix: "/event" })
 
           // - Function
           async ({ set, eventController, user }) => {
+
+               // Define user as User type
+               const userData = user! as User;
                // get Response from eventController
-               const response = await eventController.getAll();
+               const response = await eventController.getAll(userData.id);
                // Set status with status Reponse
                set.status = response.status;
                // Return response
