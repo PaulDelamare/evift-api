@@ -239,7 +239,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
             // get Response from invitationController
             const response = await invitationController.responseEventInvitation(
                 userData.id,
-                body.eventId,
+                body.invitationId,
                 body.response
             );
 
@@ -252,7 +252,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         {
             // Body must have id event in uuid format and response in boolean
             body: t.Object({
-                eventId: t.String({
+                invitationId: t.String({
                     format: "uuid",
                     error: "L'id de l'evènement est invalide",
                 }),

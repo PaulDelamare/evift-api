@@ -29,7 +29,7 @@ model User {
   userEvent           Event[]
   userEventInvitation EventInvitation[] @relation("userEventInvitation")
   userEventOrganizer  EventInvitation[] @relation("userEventOrganizer")
-  userParticipant  Participant[] 
+  userParticipant     Participant[]
 }
 
 // Invitation model (Friends Request)
@@ -69,6 +69,7 @@ model Event {
   description String
   address     String
   date        DateTime
+  time        String?
   img         String
   user        User              @relation(fields: [userId], references: [id])
   userId      String
@@ -81,13 +82,13 @@ model Event {
 model Participant {
   id String @id @unique @default(uuid())
 
-  event    Event     @relation(fields: [id_event], references: [id])
+  event    Event  @relation(fields: [id_event], references: [id])
   id_event String
-  
-  roleRef  RoleEvent @relation(fields: [id_role], references: [id])
-  id_role  String
 
-  user User     @relation(fields: [id_user], references: [id])
+  roleRef RoleEvent @relation(fields: [id_role], references: [id])
+  id_role String
+
+  user    User   @relation(fields: [id_user], references: [id])
   id_user String
 
   createdAt DateTime @default(now())
@@ -103,6 +104,6 @@ model EventInvitation {
   idUser  User   @relation("userEventInvitation", fields: [id_user], references: [id])
   id_user String
 
-  idOrganizer       User @relation("userEventOrganizer", fields: [id_organizer], references: [id])
+  idOrganizer  User   @relation("userEventOrganizer", fields: [id_organizer], references: [id])
   id_organizer String
 }

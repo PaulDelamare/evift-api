@@ -23,7 +23,7 @@ export class EventController {
      * @return - A promise that resolves to an object containing the status code and the ID of the newly created event.
      * @throws - If an error occurs during the event creation, an error server object is returned.
      */
-    public async create(id: string, body: { name: string; description: string; date: Date; address: string; img?: File | undefined; }) {
+    public async create(id: string, body: { name: string; description: string; date: Date; time: string; address: string; img?: File | undefined; }) {
 
         //? Try Create Event in Database
         try {
@@ -34,7 +34,7 @@ export class EventController {
             if (body.img) {
 
                 // Format File Name
-                imgPath = await formatFileName(body.img, './uploads/events/');
+                imgPath = await formatFileName(body.img, 'uploads/public/events/');
 
                 // Write File 
                 await Bun.write(imgPath, body.img);
@@ -46,6 +46,7 @@ export class EventController {
                     name: body.name,
                     description: body.description,
                     date: body.date,
+                    time: body.time,
                     address: body.address,
                     img: imgPath,
                     user: { connect: { id } },
@@ -82,9 +83,25 @@ export class EventController {
         }
     }
 
-    public async getAll() {
+    public async getAll(id: string) {
         try {
-            const events = await this.bdd.event.findMany({
+            const now = new Date();
+
+            const events = await this.bdd.participant.findMany({
+                where: {
+                    event: {
+                        date: {
+                            gt: now
+                        },
+                    },
+                    id_user: id
+
+                },
+                orderBy: {
+                    event: {
+                        date: 'asc'
+                    }
+                },
                 include: {
                     user: {
                         select: {
@@ -93,6 +110,18 @@ export class EventController {
                             firstname: true,
                             lastname: true
                         }
+                    },
+                    event: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    email: true,
+                                    firstname: true,
+                                    lastname: true
+                                }
+                            }
+                        }
                     }
                 }
             });
@@ -100,7 +129,7 @@ export class EventController {
                 status: 200,
                 data: events
             }
-        }catch (error: unknown) {
+        } catch (error: unknown) {
             return errorServer(
                 error,
                 "Une erreur s'est produite lors de la récupération des événement"
