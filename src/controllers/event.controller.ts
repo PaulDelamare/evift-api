@@ -136,4 +136,46 @@ export class EventController {
             );
         }
     }
+
+    /**
+     * A function to get a single event by its ID.
+     *
+     * @param id - The ID of the event to retrieve.
+     * @return An object containing the status code and the retrieved event data.
+     */
+    public async getOneEvent(id: string, id_event: string) {
+
+        // - Try Request
+        try {
+            const event = await this.bdd.participant.findFirst({
+                where: {
+                    id_event: id_event,
+                    id_user: id
+                },
+                include: {
+                    event: true
+                }
+            });
+            console.log(event)
+
+            if (!event) {
+                return {
+                    status: 404,
+                    data: "L'événement n'existe pas"
+                }
+
+            }
+            return {
+                status: 200,
+                data: event
+            }
+
+        }
+
+        // ? Catch Error 
+        catch (error) {
+            // Return Error Server
+            return errorServer(error, "Une erreur s'est produite lors de la recherche de l'événement");
+        }
+    }
 }
