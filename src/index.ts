@@ -47,24 +47,52 @@ const app = new Elysia()
     return { name: "Hello Elysia" };
   })
 
+
+  // ? Post event
+  .ws('/ws/message', {
+    // validate incoming message
+    body: t.Object({
+      message: t.String(),
+      test: t.String()
+    }),
+    message(ws, { message, test }) {
+
+      ws.send({
+        test,
+        message,
+        time: Date.now()
+      })
+    },
+    open(ws) {
+      if (!ws.data.cookie.accessToken.value) {
+        // jwt.
+
+      }
+
+    }
+  })
+
   // ! API KEY
   .use(checkApiKey)
 
   // ! CORS
   .use(
-    cors({
-      origin: "*",
-      methods: ["GET", "POST", "PUT", "DELETE"],
-      allowedHeaders: [
-        "Content-Type",
-        "Authorization",
-        "x-api-key",
-        "accept",
-        "origin",
-        "x-requested-with",
-      ],
-    })
+    cors()
   )
+  // .use(
+  //   cors({
+  //     origin: "http://localhost:5173",
+  //     methods: ["GET", "POST", "PUT", "DELETE"],
+  //     allowedHeaders: [
+  //       "Content-Type",
+  //       "Authorization",
+  //       "x-api-key",
+  //       "accept",
+  //       "origin",
+  //       "x-requested-with",
+  //     ],
+  //   })
+  // )
 
   // ! GROUP ROUTES
   .group("/api", (app) =>
