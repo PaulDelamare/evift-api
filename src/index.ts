@@ -8,6 +8,7 @@ import { invite } from "./routes/invitation.routes";
 import { friends } from "./routes/friends.routes";
 import { event } from "./routes/event.routes";
 import { rolesEvent } from "./routes/rolesEvent.routes";
+import { message } from "./routes/webSocket/message.routes";
 import { checkApiKey } from "./plugins/checkApiKey";
 // For access to the static files
 
@@ -80,6 +81,8 @@ const app = new Elysia()
       .use(event)
       // Events roles
       .use(rolesEvent)
+      // Message
+      .use(message)
   )
 
   // ! RUN SERVER

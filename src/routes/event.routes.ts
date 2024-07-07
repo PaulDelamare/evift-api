@@ -67,7 +67,7 @@ export const event = new Elysia({ prefix: "/event" })
 
           }
      )
-     
+
      .get(
           // - Path
           "/getAll",
@@ -94,3 +94,30 @@ export const event = new Elysia({ prefix: "/event" })
                }
           }
      )
+
+     .get(
+          // - Path
+          "/getOneEvent/:id",
+
+          // - Function
+          async ({ set, eventController, user, params }) => {
+
+               // Define user as User type
+               const userData = user! as User;
+               // get Response from eventController
+               const response = await eventController.getOneEvent(userData.id, params.id);
+               // Set status with status Reponse
+               set.status = response.status;
+               // Return response
+               return response;
+          },
+          {
+               params: t.Object({
+                    id: t.String({ format: "uuid", error: "L'id doit être un uuid" }),
+               }),
+               detail: {
+                    tags: ['Event'],
+                    summary: 'Get one event'
+               }
+          }
+     );
