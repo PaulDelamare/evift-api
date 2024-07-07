@@ -49,12 +49,15 @@ export const message = new Elysia({ prefix: "/ws" })
                test: t.String()
           }),
           message(ws, { message, test }) {
-               console.log(ws.data);
                
                ws.send({
                     test,
                     message,
                     time: Date.now()
                })
-          }
+          },
+          open(ws) {
+               console.log(ws.data.cookie)
+               // ws.data = "Hello World";
+          },
      })
