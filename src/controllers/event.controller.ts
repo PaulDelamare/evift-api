@@ -156,7 +156,6 @@ export class EventController {
                     event: true
                 }
             });
-            console.log(event)
 
             if (!event) {
                 return {
