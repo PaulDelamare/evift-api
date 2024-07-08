@@ -58,4 +58,32 @@ export const rolesEvent = new Elysia({ prefix: "/rolesEvent" })
                     name: t.String()
                }),
           }
-     );
+     )
+
+     .get(
+          // - Path
+          "/findAll",
+
+          // - Function
+          async ({ body, set, roleController }) => {
+
+               // get Response from invitationController
+               const response = await roleController.findAll();
+
+               // Set status with status Reponse
+               set.status = response.status;
+
+               // Return response
+               return response;
+          },
+
+          // - VALIDATION
+          {
+
+               detail: {
+                    tags: ['Role'],
+                    summary: 'Request for get all roles for user in the event'
+               }
+
+          }
+     )
