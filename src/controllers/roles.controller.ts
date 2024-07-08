@@ -51,4 +51,28 @@ export class RolesController {
                );
           }
      }
+
+     public async findAll() {
+
+          //? Try Get All Role in Database
+          try {
+               // Get All Role
+               const roles = await this.bdd.roleEvent.findMany();
+               // Return Success
+               return {
+                    status: 200,
+                    data: roles
+               };
+          }
+
+          // ? If an error occur
+          catch (error: unknown) {
+               // Return Error Server
+               return errorServer(
+                    error,
+                    "Une erreur s'est produite lors de la recherche des roles"
+               );
+          }
+     }
+
 }
