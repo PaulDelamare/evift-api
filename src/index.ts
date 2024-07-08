@@ -10,7 +10,6 @@ import { event } from "./routes/event.routes";
 import { rolesEvent } from "./routes/rolesEvent.routes";
 import { message } from "./routes/webSocket/message.routes";
 import { checkApiKey } from "./plugins/checkApiKey";
-// For access to the static files
 
 // Variable
 // Get Port form .env
@@ -47,13 +46,18 @@ const app = new Elysia()
     return { name: "Hello Elysia" };
   })
 
+  // ! WEBSOCKET
+  .use(message)
+
+
   // ! API KEY
   .use(checkApiKey)
 
   // ! CORS
+
   .use(
     cors({
-      origin: "*",
+      origin: "http://localhost:5173",
       methods: ["GET", "POST", "PUT", "DELETE"],
       allowedHeaders: [
         "Content-Type",
@@ -81,8 +85,6 @@ const app = new Elysia()
       .use(event)
       // Events roles
       .use(rolesEvent)
-      // Message
-      .use(message)
   )
 
   // ! RUN SERVER
