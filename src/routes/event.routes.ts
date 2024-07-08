@@ -120,4 +120,69 @@ export const event = new Elysia({ prefix: "/event" })
                     summary: 'Get one event'
                }
           }
-     );
+     )
+
+     .get(
+          // - Path
+          "/getAllParticipantsForEvent/:id",
+
+          // - Function
+          async ({ set, eventController, user, params }) => {
+
+               // Define user as User type
+               const userData = user! as User;
+               // get Response from eventController
+               const response = await eventController.getAllParticipantsForEvent(params.id, userData.id);
+               // Set status with status Reponse
+               set.status = response.status;
+               // Return response
+               return response;
+          },
+
+          // - VALIDATION
+          {
+               params: t.Object({
+                    id: t.String({ format: "uuid", error: "L'id doit être un uuid" }),
+               }),
+               detail: {
+                    tags: ['Event'],
+                    summary: 'Get all participants for event'
+               }
+          }
+     )
+
+     .patch(
+          // - Path
+          "/updateParticipant",
+
+          // - Function
+          async ({ body, set, eventController, user, params }) => {
+
+               // Define user as User type
+               const userData = user! as User;
+
+               if (userData.id !== body.id_user) {
+                    // get Response from eventController
+                    const response = await eventController.updateParticipant(body.id_event, body.id_user, body.id_role, userData.id);
+                    // Set status with status Reponse
+                    set.status = response.status;
+                    // Return response
+                    return response;
+               }
+               return { status: 400, error: "Vous ne pouvez pas vous modifier" };
+
+          },
+
+          // - VALIDATION
+          {
+               body: t.Object({
+                    id_user: t.String({ format: "uuid", error: "L'id doit être un uuid" }),
+                    id_event: t.String({ format: "uuid", error: "L'id doit être un uuid" }),
+                    id_role: t.String({ format: "uuid", error: "L'id doit être un uuid" }),
+               }),
+               detail: {
+                    tags: ['Event'],
+                    summary: 'Update participant for event'
+               }
+          }
+     )
