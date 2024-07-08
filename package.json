@@ -13,6 +13,7 @@
     "@prisma/client": "5.15.0",
     "elysia": "latest",
     "handlebars": "^4.7.8",
+    "mongoose": "^8.4.5",
     "nodemailer": "^6.9.13",
     "pg": "^8.12.0"
   },
