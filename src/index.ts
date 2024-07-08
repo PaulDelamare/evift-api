@@ -10,7 +10,6 @@ import { event } from "./routes/event.routes";
 import { rolesEvent } from "./routes/rolesEvent.routes";
 import { message } from "./routes/webSocket/message.routes";
 import { checkApiKey } from "./plugins/checkApiKey";
-// For access to the static files
 
 // Variable
 // Get Port form .env
@@ -47,52 +46,29 @@ const app = new Elysia()
     return { name: "Hello Elysia" };
   })
 
+  // ! WEBSOCKET
+  .use(message)
 
-  // ? Post event
-  .ws('/ws/message', {
-    // validate incoming message
-    body: t.Object({
-      message: t.String(),
-      test: t.String()
-    }),
-    message(ws, { message, test }) {
-
-      ws.send({
-        test,
-        message,
-        time: Date.now()
-      })
-    },
-    open(ws) {
-      if (!ws.data.cookie.accessToken.value) {
-        // jwt.
-
-      }
-
-    }
-  })
 
   // ! API KEY
   .use(checkApiKey)
 
   // ! CORS
+
   .use(
-    cors()
+    cors({
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "x-api-key",
+        "accept",
+        "origin",
+        "x-requested-with",
+      ],
+    })
   )
-  // .use(
-  //   cors({
-  //     origin: "http://localhost:5173",
-  //     methods: ["GET", "POST", "PUT", "DELETE"],
-  //     allowedHeaders: [
-  //       "Content-Type",
-  //       "Authorization",
-  //       "x-api-key",
-  //       "accept",
-  //       "origin",
-  //       "x-requested-with",
-  //     ],
-  //   })
-  // )
 
   // ! GROUP ROUTES
   .group("/api", (app) =>
@@ -109,8 +85,6 @@ const app = new Elysia()
       .use(event)
       // Events roles
       .use(rolesEvent)
-      // Message
-      .use(message)
   )
 
   // ! RUN SERVER
