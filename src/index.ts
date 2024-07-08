@@ -10,6 +10,7 @@ import { event } from "./routes/event.routes";
 import { rolesEvent } from "./routes/rolesEvent.routes";
 import { message } from "./routes/webSocket/message.routes";
 import { checkApiKey } from "./plugins/checkApiKey";
+import { rateLimit } from "elysia-rate-limit";
 
 // Variable
 // Get Port form .env
@@ -17,6 +18,7 @@ const port = process.env.PORT!;
 
 // ! INSTANCE
 const app = new Elysia()
+  .use(rateLimit())
 
   // ! SWAGGER
   .use(
