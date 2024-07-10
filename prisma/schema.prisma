@@ -30,6 +30,9 @@ model User {
   userEventInvitation EventInvitation[] @relation("userEventInvitation")
   userEventOrganizer  EventInvitation[] @relation("userEventOrganizer")
   userParticipant     Participant[]
+  userListGift        ListGift[]
+  gifts               Gifts[] @relation("gift")
+  giftsTaken               Gifts[] @relation("userTaken")
 }
 
 // Invitation model (Friends Request)
@@ -77,6 +80,7 @@ model Event {
   updatedAt   DateTime          @updatedAt
   event       Participant[]
   invitation  EventInvitation[]
+  listgift    ListEvent[]
 }
 
 model Participant {
@@ -90,6 +94,8 @@ model Participant {
 
   user    User   @relation(fields: [id_user], references: [id])
   id_user String
+
+  eventList ListEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -106,4 +112,56 @@ model EventInvitation {
 
   idOrganizer  User   @relation("userEventOrganizer", fields: [id_organizer], references: [id])
   id_organizer String
+}
+
+model ListGift {
+  id   String @id @unique @default(uuid())
+  name String
+
+  user    User   @relation(fields: [id_user], references: [id])
+  id_user String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gifts     Gifts[]
+  listEvent ListEvent[]
+}
+
+model Gifts {
+  id String @id @unique @default(uuid())
+
+  id_list String
+  list    ListGift @relation(fields: [id_list], references: [id])
+
+  id_user String
+  user    User   @relation("gift", fields: [id_user], references: [id])
+
+  taken Boolean @default(false)
+
+  userTaken    User?   @relation("userTaken", fields: [id_userTaken], references: [id])
+  id_userTaken String?
+
+  name     String
+  quantity Int
+  url      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ListEvent {
+  id String @id @unique @default(uuid())
+
+  id_event String
+  event    Event  @relation(fields: [id_event], references: [id])
+
+  id_participant String
+  participant    Participant @relation(fields: [id_participant], references: [id])
+
+  id_list String
+  list    ListGift @relation(fields: [id_list], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
