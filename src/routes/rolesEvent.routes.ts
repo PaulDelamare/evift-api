@@ -79,10 +79,24 @@ export const rolesEvent = new Elysia({ prefix: "/rolesEvent" })
 
           // - VALIDATION
           {
+               response: {
+                    200: t.Object({
+                         data: t.Array(t.Object({
+                              id: t.String(),
+                              name: t.String(),
+                              createdAt: t.Date()
+                         })),
+                         status: t.Number(),
+                    }),
+                    500: t.Object({
+                         status: t.Number(),
+                         error: t.String(),
+                    })
+               },
 
                detail: {
                     tags: ['Role'],
-                    summary: 'Request for get all roles for user in the event'
+                    summary: 'Request for get all event role',
                }
 
           }
