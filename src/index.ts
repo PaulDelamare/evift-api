@@ -7,10 +7,10 @@ import { user } from "./routes/user.routes";
 import { invite } from "./routes/invitation.routes";
 import { friends } from "./routes/friends.routes";
 import { event } from "./routes/event.routes";
+import { gift } from "./routes/gift.routes";
 import { rolesEvent } from "./routes/rolesEvent.routes";
 import { message } from "./routes/webSocket/message.routes";
 import { checkApiKey } from "./plugins/checkApiKey";
-import { rateLimit } from "elysia-rate-limit";
 
 // Variable
 // Get Port form .env
@@ -18,7 +18,6 @@ const port = process.env.PORT!;
 
 // ! INSTANCE
 const app = new Elysia()
-  .use(rateLimit())
 
   // ! SWAGGER
   .use(
@@ -79,14 +78,21 @@ const app = new Elysia()
     app.use(auth)
       // User route
       .use(user)
+
       // Invitation route
       .use(invite)
+
       // Friends route
       .use(friends)
+
       // Events route
       .use(event)
-      // Events roles
+
+      // Role route
       .use(rolesEvent)
+
+      // Gifts routes
+      .use(gift)
   )
 
   // ! RUN SERVER
