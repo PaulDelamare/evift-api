@@ -112,6 +112,8 @@ model EventInvitation {
 
   idOrganizer  User   @relation("userEventOrganizer", fields: [id_organizer], references: [id])
   id_organizer String
+
+  createdAt DateTime @default(now())
 }
 
 model ListGift {
