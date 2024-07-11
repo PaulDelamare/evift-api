@@ -4,7 +4,7 @@
 
 - Posséder node
 
-- Posséder Bun. Pour ce faire executer dans votre terminal :
+- Posséder Bun. Pour ce faire exécuter dans votre terminal :
 
 ```bash
 npm install -g bun
@@ -38,22 +38,24 @@ cd evift-api
 
 - Récupérer le .env.exemple dans la racine du code et créer le fichier .env à la racine
 
-- Passer dans le .env les informations nécessaire montrer dans le exemple à modifiant avec vos propres données
+- Passer dans le .env les informations nécessaires montrer dans l'exemple à modifiant avec vos propres données
 
-### Installer les dépendance
+### Installer les dépendances
 
-Pour le bon fonctionnement du projet il faut tout d'abord installer les dépendance de celui-ci et éviter les erreurs.
-Pour ce faire executer :
+Pour le bon fonctionnement du projet, il faut tout d'abord installer les dépendances de celui-ci et éviter les erreurs.
+Pour ce faire exécuter :
 
 ```bash
 bun install
 ```
 
-### Créer la base de donnée
+### Créer la base de données
 
-- Créer dans votre postgres via pgAdmin la base de donnée "evift"
+- Créer dans votre postgres via pgAdmin la base de données "evift"
 
-- Créer dans votre MongoCompass la base de donnée "eviftMessage" et ajouté en première collection "messages"
+- Créer dans votre MongoCompass la base de données "eviftMessage" et ajouté en première collection "messages"
+
+- Mettez dans le.env les informations liées à votre base
 
 - effectuer dans le terminal de commande dans le projet "evift-api" la commande
 
@@ -63,18 +65,18 @@ bun migrate
 
 ### Création des rôles
 
-- Créer les roles pour le site. Pour se faire exécuter :
+- Créer les rôles pour le site. Pour se faire exécuter :
 
 ```bash
 bun create-role
 ```
 
-## Lancer le server
+## Lancer le serveur
 
-Et pour finir et lancer le server, il ne reste plus qu'à exécuter :
+Et pour finir et lancer le serveur, il ne reste plus qu'à exécuter :
 
 ```bash
-bun run dev
+bun dev
 ```
 
-Le server se lancera sur http://localhost:<port du .env>/
+Le serveur se lancera sur http://localhost:/
