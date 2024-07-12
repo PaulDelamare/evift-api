@@ -29,36 +29,37 @@ export const rolesEvent = new Elysia({ prefix: "/rolesEvent" })
      // ! ROUTES
 
      // ? Create new role Event
-     .post(
-          // - Path
-          "/create",
+     // ! TO USE LATER WHEN OTHER REAL ROLE WILL BE CREATED
+     // .post(
+     //      // - Path
+     //      "/create",
 
-          // - Function
-          async ({ body, set, roleController }) => {
+     //      // - Function
+     //      async ({ body, set, roleController }) => {
 
-               // get Response from invitationController
-               const response = await roleController.create(
-                    body.name
-               );
+     //           // get Response from invitationController
+     //           const response = await roleController.create(
+     //                body.name
+     //           );
 
-               // Set status with status Reponse
-               set.status = response.status;
+     //           // Set status with status Reponse
+     //           set.status = response.status;
 
-               // Return response
-               return response;
-          },
+     //           // Return response
+     //           return response;
+     //      },
 
-          // - VALIDATION
-          {
-               detail: {
-                    tags: ['Role'],
-                    summary: 'Request for create new role for user in the event'
-               },
-               body: t.Object({
-                    name: t.String()
-               }),
-          }
-     )
+     //      // - VALIDATION
+     //      {
+     //           detail: {
+     //                tags: ['Role'],
+     //                summary: 'Request for create new role for user in the event'
+     //           },
+     //           body: t.Object({
+     //                name: t.String()
+     //           }),
+     //      }
+     // )
 
      .get(
           // - Path
