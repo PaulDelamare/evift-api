@@ -312,6 +312,13 @@ export class GiftController {
           }
      }
 
+     /**
+      * A function to find a list based on the provided user and list IDs.
+      *
+      * @param idUser - The ID of the user performing the action.
+      * @param idList - The ID of the list to find.
+      * @return An object with the status code and the list data if found, or an error message if not found.
+      */
      public async findList(idUser: string, idList: string) {
 
           // ? Try Request
