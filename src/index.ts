@@ -30,6 +30,9 @@ const app = new Elysia()
           { name: "Invitation", description: "Friends Invitation request" },
           { name: "Event", description: "All the request link to the event gestion" },
           { name: "Role", description: "All the request link to the role gestion" },
+          { name: "Gift", description: "All the request link to the gift gestion" },
+          { name: "Image", description: "Request for get Image from API" },
+          { name: "Friends", description: "All the request link to the friends gestion" },
         ],
       },
     })
@@ -40,7 +43,11 @@ const app = new Elysia()
   .get('/image', ({ query }) => Bun.file(query.name), {
     query: t.Object({
       name: t.String()
-    })
+    }),
+    detail: {
+      tags: ['Image'],
+      summary: 'Create sipple path for get Image form API'
+    },
   })
   // ! HELLO WORLD !
   .get("/", ({ headers }) => {

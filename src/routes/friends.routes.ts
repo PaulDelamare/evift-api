@@ -2,7 +2,7 @@
 import { Elysia, t } from "elysia";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
-import { User } from "../models/User";
+import { User, userModel } from "../models/User";
 import { FriendsController } from "../controllers/friends.controller";
 
 // Create Invitaion Route
@@ -27,6 +27,9 @@ export const friends = new Elysia({ prefix: "/friends" })
     // ? Use Plugin for check if user is logged
     .use(authPlugin)
 
+    // Import model for user
+    .use(userModel)
+
     // ! ROUTES
 
     // ? Post request friends invitation
@@ -35,7 +38,7 @@ export const friends = new Elysia({ prefix: "/friends" })
         "/findAll",
 
         // - Function
-        async ({ body, set, friendsController, user }) => {
+        async ({ set, friendsController, user }) => {
 
             // Define user as User type
             const userData = user! as User;
@@ -55,8 +58,8 @@ export const friends = new Elysia({ prefix: "/friends" })
         // - VALIDATION
         {
             detail: {
-                tags: ['Invitation'],
+                tags: ['Friends'],
                 summary: 'Send request for add friend to an other user'
-            }
+            },
         }
     );

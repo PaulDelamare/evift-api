@@ -96,7 +96,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         {
             detail: {
                 tags: ['Invitation'],
-                summary: 'Send request for add friend to an other user'
+                summary: 'Find all Friends Request for our account'
             }
         }
     )
@@ -143,7 +143,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
             // Add this to invitation swagger
             detail: {
                 tags: ['Invitation'],
-                summary: 'Send request for add friend to an other user'
+                summary: 'Send response for add friend or just delete request'
             }
         }
     )
@@ -188,7 +188,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
                 }),
             }),
             detail: {
-                tags: ['Event'],
+                tags: ['Invitation'],
                 summary: 'Send request for participation in an event'
             }
         }
@@ -219,7 +219,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
 
             // Body must have id with format uuid
             detail: {
-                tags: ['Event'],
+                tags: ['Invitation'],
                 summary: 'Get all request for participation in an event'
             }
         }
@@ -262,7 +262,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
             }),
             // Add this to invitation swagger
             detail: {
-                tags: ['Event'],
+                tags: ['Invitation'],
                 summary: 'Give response for participation in an event'
             }
         }
@@ -294,7 +294,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         {
             detail: {
                 tags: ['Invitation'],
-                summary: 'Send request for add friend to an other user'
+                summary: 'Get count for event and friends invitation'
             }
         }
     )
