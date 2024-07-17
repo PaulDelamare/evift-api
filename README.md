@@ -2,9 +2,9 @@
 
 ## Prérequis
 
-- Posséder node
+- Posséder node (version 9.8.1 utilisé dasn ce projet)
 
-- Posséder Bun. Pour ce faire exécuter dans votre terminal :
+- Posséder Bun (version 1.1.12 utilisé pour ce projet). Pour ce faire exécuter dans votre terminal :
 
 ```bash
 npm install -g bun
