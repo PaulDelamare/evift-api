@@ -76,13 +76,19 @@ export class AuthController {
      * @return - A promise that resolves to an object with the status code and message.
      * @throws - If an error occurs during the registration process.
      */
-    public async register(body: {firstname: string; lastname: string; email: string; password: string}) {
+    public async register(body: { firstname: string; lastname: string; email: string; password: string }) {
 
         //? Try Create User in Database
         try {
 
             // Hash Password before creation
             const hashedPassword = await Bun.password.hash(body.password);
+
+            const alreadyUser = await this.bdd.user.findUnique({ where: { email: body.email } });
+
+            if (alreadyUser) {
+                return { status: 400, error: "Cet email est déjà utilisé !" };
+            }
 
             // Create User
             const newUser = await this.bdd.user.create({

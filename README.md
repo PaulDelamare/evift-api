@@ -12,7 +12,7 @@ npm install -g bun
 
 > Pour vérifier que l'installation a bien fonctionné, effectuer : bun -v
 
-- Posséder Postgres. Installer Postgres et pgAdmin
+- Posséder Postgres. Installer Postgres (version 16.3 pour le projet) et pgAdmin
   https://www.postgresql.org/download/
   https://www.pgadmin.org/download/
 
