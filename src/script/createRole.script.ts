@@ -26,7 +26,6 @@ async function main() {
         })
 
         const roles = await prisma.roleEvent.findMany();
-        console.log(roles);
     } catch (error) {
         throw error
     }

@@ -47,3 +47,5 @@ bun.lockb
 prisma/migrations/*
 
 uploads/*
+
+*.tar
