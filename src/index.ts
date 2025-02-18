@@ -50,7 +50,7 @@ const app = new Elysia()
     },
   })
   // ! HELLO WORLD !
-  .get("/", ({ headers }) => {
+  .get("/", ({ }) => {
     return { name: "Hello Elysia" };
   })
 
