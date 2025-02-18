@@ -7,7 +7,7 @@
     "migrate": "bunx prisma migrate dev --name init",
     "create-role": "bun run src/script/createRole.script.ts",
     "docker:linux": "docker build -t evift-api . --platform=linux/amd64",
-		"docker:tar": "docker save evift-api > image-linux.tar"
+    "docker:tar": "docker save evift-api > image-linux.tar"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.0.2",
@@ -30,5 +30,8 @@
   "module": "src/index.js",
   "bun-create": {
     "start": "bun run src/index.ts"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
   }
 }
