@@ -7,7 +7,7 @@ WORKDIR /app
 # Copier les fichiers de configuration
 COPY package.json bun.lockb ./
 
-# Installer les dépendances de développement
+# Installer toutes les dépendances (développement + production)
 RUN bun install
 
 # Copier le reste du code source
@@ -22,11 +22,8 @@ FROM oven/bun AS runner
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier uniquement les fichiers nécessaires depuis le builder
+# Copier l'intégralité de l'application depuis le builder (y compris node_modules)
 COPY --from=builder /app /app
-
-# Installer uniquement les dépendances de production
-RUN bun install --production
 
 # Exposer le port de l'application
 EXPOSE 3000
@@ -35,4 +32,4 @@ EXPOSE 3000
 ENV NODE_ENV=production
 
 # Exécuter les migrations Prisma et démarrer l'application
-CMD ["sh", "-c", "bunx prisma migrate deploy && bun src/index.ts"]
+CMD ["sh", "-c", "bunx prisma generate && bun run migrate && bun src/index.ts"]
