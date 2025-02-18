@@ -4,7 +4,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "migrate": "bunx prisma migrate dev --name init",
+    "migrate": "bunx prisma migrate dev --schema=prisma/schema.prisma --name init",
     "create-role": "bun run src/script/createRole.script.ts",
     "docker:linux": "docker build -t evift-api . --platform=linux/amd64",
 		"docker:tar": "docker save evift-api > image-linux.tar"
