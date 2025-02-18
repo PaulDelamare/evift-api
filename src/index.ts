@@ -80,6 +80,7 @@ const app = new Elysia()
 
   // ! GROUP ROUTES
   .group("/api", (app) =>
+
     // - Auth routes
     // Auth route
     app.use(auth)
