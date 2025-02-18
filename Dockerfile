@@ -35,4 +35,4 @@ EXPOSE 3000
 ENV NODE_ENV=production
 
 # Exécuter les migrations Prisma et démarrer l'application
-CMD ["sh", "-c", "bun migrate && bun src/index.ts"]
+CMD ["sh", "-c", "bun deploy && bun src/index.ts"]
