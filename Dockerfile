@@ -1,6 +1,8 @@
 # Étape 1 : Construction
 FROM oven/bun AS builder
 
+ENV PRISMA_QUERY_ENGINE_TYPE=binary
+
 # Définir le répertoire de travail
 WORKDIR /app
 
@@ -30,6 +32,7 @@ EXPOSE 3000
 
 # Définir la variable d'environnement pour la production
 ENV NODE_ENV=production
+
 
 # Exécuter les migrations Prisma et démarrer l'application
 CMD ["sh", "-c", "bun src/index.ts"]
