@@ -1,38 +1,44 @@
-# Étape 1 : Construction
-FROM oven/bun AS builder
+FROM node:18-slim AS prisma-builder
 
-ENV PRISMA_QUERY_ENGINE_TYPE=binary
-
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers de configuration
-COPY package.json bun.lockb ./
+# Copier les fichiers nécessaires pour Prisma
+COPY package.json package-lock.json* ./
+COPY prisma ./prisma/
 
-# Installer toutes les dépendances (développement + production)
+# Installer et générer Prisma
+RUN npm install --no-fund --no-audit prisma @prisma/client
+RUN npx prisma generate
+
+# Étape 2: Application avec Bun
+FROM oven/bun:latest
+
+WORKDIR /app
+
+# Installer Node.js moderne dans Bun
+RUN apt-get update && apt-get install -y \
+     curl \
+     && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+     && apt-get install -y nodejs \
+     && apt-get clean \
+     && rm -rf /var/lib/apt/lists/*
+
+# Vérifier les versions
+RUN node -v && bun -v
+
+# Copier l'application
+COPY . .
+COPY --from=prisma-builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=prisma-builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=prisma-builder /app/node_modules/prisma ./node_modules/prisma
+
+# Installer les dépendances avec Bun
 RUN bun install
 
-# Copier le reste du code source
-COPY . .
 
-# Générer le client Prisma
-RUN bunx prisma generate
-
-# Étape 2 : Exécution
-FROM oven/bun AS runner
-
-# Définir le répertoire de travail
-WORKDIR /app
-
-# Copier l'intégralité de l'application depuis le builder (y compris node_modules)
-COPY --from=builder /app /app
-
-# Exposer le port de l'application
+# Exposer le port et définir l'environnement
 EXPOSE 3000
-
-# Définir la variable d'environnement pour la production
 ENV NODE_ENV=production
 
-
-# Exécuter les migrations Prisma et démarrer l'application
+# Démarrer avec un script qui migre puis lance l'application
 CMD ["sh", "-c", "bun src/index.ts"]
