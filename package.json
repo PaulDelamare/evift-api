@@ -13,7 +13,7 @@
     "@elysiajs/cors": "^1.0.2",
     "@elysiajs/jwt": "^1.0.2",
     "@elysiajs/swagger": "^1.0.5",
-    "@prisma/client": "^6.4.0",
+    "@prisma/client": "^6.6.0",
     "elysia": "latest",
     "elysia-rate-limit": "^4.1.0",
     "handlebars": "^4.7.8",
@@ -25,7 +25,7 @@
     "@types/nodemailer": "^6.4.15",
     "@types/pg": "^8.11.6",
     "bun-types": "latest",
-    "prisma": "^6.4.0"
+    "prisma": "^6.6.0"
   },
   "module": "src/index.js",
   "bun-create": {
