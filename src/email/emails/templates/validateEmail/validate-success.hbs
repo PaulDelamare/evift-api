@@ -2,15 +2,32 @@
 
 <div class="body">
 
-    <h3>Bienvenue {{ firstname }} !</h3>
+    <h3 style="color: #004396;">Bienvenue {{ firstname }} !</h3>
     <div class="first-paragraph">
-        <p>
+        <p style="color: #004396;">
             Votre compte à correctement été crée !
         </p>
     </div>
     <div>
-        {{!-- <p>Lors de la connexion, un code vous sera envoyé par email, merci de bien le rentrer dans l'application pour vous connecter. Ceci à pour but de sécuriser au plus votre compte et vos informations personnelles</p> --}}
-        <p>En cas d'un possible problème avec votre compte ou d'un tout autre genre, merci de prendre contact avec l'adresse email à votre dispoition : {{emailService}}</p>
+        {{!-- <p>Lors de la connexion, un code vous sera envoyé par email, merci de bien le rentrer dans l'application
+            pour vous connecter. Ceci à pour but de sécuriser au plus votre compte et vos informations personnelles</p>
+        --}}
+        <p style="color: #004396;">En cas d'un possible problème avec votre compte ou d'un tout autre genre, merci de
+            prendre contact avec l'adresse email à votre disposition : {{emailService}}</p>
+    </div>
+    <div
+        style="margin-top: 1.5rem; background: #e6f0fa; padding: 1rem 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,67,150,0.05); width: fit-content; margin: 0 auto; text-align: center;">
+        <span style="color: #004396; font-weight: 500; text-align: center;">
+            Connectez-vous dès maintenant sur l'application Evift&nbsp;!
+        </span>
+        <br>
+        <div style="width: fit-content; margin: 0 auto; text-align: center;">
+            <a href="https://evift.fr/evift/login"
+                style="display: inline-block; margin-top: 1rem; background: #A3009C; color: #fff; padding: 0.7rem 1.5rem; border-radius: 5px; text-decoration: none; font-weight: bold; box-shadow: 0 2px 4px rgba(0,67,150,0.10);">
+                Accéder au site
+            </a>
+        </div>
+
     </div>
 </div>
 <style>
