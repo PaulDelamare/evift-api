@@ -38,7 +38,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         async ({ body, set, invitationController, user }) => {
 
             // Define user as User type
-            const userData = user! as User;
+            const userData = user!  as unknown as User;
 
             // get Response from invitationController
             const response = await invitationController.invitationUser(
@@ -78,7 +78,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         async ({ body, set, invitationController, user }) => {
 
             // Define user as User type
-            const userData = user! as User;
+            const userData = user!  as unknown as User;
 
             // get Response from invitationController
             const response = await invitationController.findInvitations(
@@ -111,7 +111,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         async ({ body, set, invitationController, user }) => {
 
             // Define user as User type
-            const userData = user! as User;
+            const userData = user!  as unknown as User;
 
             // get Response from invitationController
             // For add friend or just delete request
@@ -157,7 +157,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         async ({ body, set, invitationController, user }) => {
 
             // Define user as User type
-            const userData = user! as User;
+            const userData = user!  as unknown as User;
 
             // get Response from invitationController
             const response = await invitationController.eventInvitation(
@@ -202,7 +202,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         async ({ set, invitationController, user }) => {
 
             // Define user as User type
-            const userData = user! as User;
+            const userData = user!  as unknown as User;
 
             // get Response from invitationController
             const response = await invitationController.getEventInvitations(
@@ -234,7 +234,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         async ({ body, set, invitationController, user }) => {
 
             // Define user as User type
-            const userData = user! as User;
+            const userData = user!  as unknown as User;
 
             // get Response from invitationController
             const response = await invitationController.responseEventInvitation(
@@ -278,7 +278,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
         async ({ body, set, invitationController, user }) => {
 
             // Define user as User type
-            const userData = user! as User;
+            const userData = user!  as unknown as User;
 
             // get Response from invitationController
             const response = await invitationController.countInvitations(userData.id);
