@@ -40,7 +40,7 @@ export const gift = new Elysia({ prefix: "/gift" })
           // - Function
           async ({ set, giftController, user }) => {
                // Define user as User type
-               const userData = user! as User;
+               const userData = user! as unknown as User;
 
                // get Response from invitationController
                const response = await giftController.findAll(userData.id);
@@ -68,7 +68,7 @@ export const gift = new Elysia({ prefix: "/gift" })
           async ({ body, set, giftController, user }) => {
 
                // Define user as User type
-               const userData = user! as User;
+               const userData = user! as unknown as User;
 
                // get Response from invitationController
                const response = await giftController.create(
@@ -100,7 +100,7 @@ export const gift = new Elysia({ prefix: "/gift" })
           // - Function
           async ({ body, set, giftController, user }) => {
                // Define user as User type
-               const userData = user! as User;
+               const userData = user! as unknown as User;
 
                // get Response from invitationController
                const response = await giftController.addListEvent(
@@ -135,7 +135,7 @@ export const gift = new Elysia({ prefix: "/gift" })
           // - Function
           async ({ set, giftController, user, params }) => {
                // Define user as User type
-               const userData = user! as User;
+               const userData = user! as unknown as User;
 
                // get Response from invitationController
                const response = await giftController.findListEvent(userData.id, params.idEvent);
@@ -164,7 +164,7 @@ export const gift = new Elysia({ prefix: "/gift" })
           // - Function
           async ({ set, giftController, user, body }) => {
                // Define user as User type
-               const userData = user! as User;
+               const userData = user! as unknown as User;
 
                // get Response from invitationController
                const response = await giftController.removeListEvent(userData.id, body);
@@ -196,7 +196,7 @@ export const gift = new Elysia({ prefix: "/gift" })
           // - Function
           async ({ set, giftController, user, params }) => {
                // Define user as User type
-               const userData = user! as User;
+               const userData = user! as unknown as User;
 
                // get Response from invitationController
                const response = await giftController.findList(userData.id, params.idList);
@@ -226,7 +226,7 @@ export const gift = new Elysia({ prefix: "/gift" })
           async ({ set, giftController, user, body }) => {
 
                // Define user as User type
-               const userData = user! as User;
+               const userData = user! as unknown as User;
 
                // get Response from invitationController
                const response = await giftController.checkGift(userData.id, body);
