@@ -41,7 +41,7 @@ export const friends = new Elysia({ prefix: "/friends" })
         async ({ set, friendsController, user }) => {
 
             // Define user as User type
-            const userData = user! as User;
+            const userData = user!  as unknown as User;
 
             // get Response from invitationController
             const response = await friendsController.findAll(
