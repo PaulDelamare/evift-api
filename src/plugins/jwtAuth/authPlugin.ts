@@ -12,51 +12,40 @@ import { jwtConfig } from "./jwtConfig";
  */
 const authPlugin = (app: Elysia) =>
     app
-        // Use jwtConfig
         .use(jwtConfig)
 
         .derive(async ({ jwt, cookie: { accessToken }, set }) => {
-            
-            // Verify access token
+
             if (!accessToken.value) {
 
-                // handle error for access token is not available
                 set.status = 401;
 
                 throw new Error("Vous devez vous authentifier");
             }
 
-            // Verify access token
             const jwtPayload = await jwt.verify(accessToken.value);
             if (!jwtPayload) {
-                // handle error for access token is tempted or incorrect
                 set.status = 403;
-                // throw new Error("Accès invalide");
 
                 throw new Error("Accès invalide");
             }
 
-            // Find user from access token
             const userId = jwtPayload.sub;
             const user = await bdd.user.findUnique({
                 where: {
                     id: userId,
                 },
-                select: { id: true, email: true, firstname: true, lastname: true, createdAt: true },
+                select: { id: true, email: true, firstname: true, lastname: true, createdAt: true, firstLogin: true },
             });
 
-            // Verify user
             if (!user) {
-                // handle error for user not found from the provided access token
                 set.status = 403;
                 throw new Error("Access token est invalide");
             }
 
-            // Return user
             return {
                 user,
             };
         });
 
-// export
 export { authPlugin };
