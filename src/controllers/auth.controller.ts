@@ -19,10 +19,8 @@ export class AuthController {
     // ! LOGIN
     public async login(body: { email: string; password: string }) {
 
-        // - Try Request
         try {
 
-            // Find User in Database with Email
             const user = await this.bdd.user.findUnique({
                 where: { email: body.email },
                 select: {
@@ -34,36 +32,29 @@ export class AuthController {
                 },
             });
 
-            // Return Error if User not found
             if (!user) {
                 return { status: 400, error: "L'adresse email ou le mot de passe est incorrect" };
             }
 
-            // Check if Password match
             const matchPassword = await Bun.password.verify(
                 body.password,
                 user.password
             );
 
-            // Return Error if Password not match
             if (!matchPassword) {
                 return { status: 400, error: "L'adresse email ou le mot de passe est incorrect" };
             }
 
-            // Remove password from user
             const { password, ...userWithoutPassword } = user
 
-            // Return Success message 
             return {
                 status: 200,
                 data: userWithoutPassword
             }
         }
 
-        // - Catch Error
         catch (error) {
 
-            // Return Error Server
             return errorServer(error, "Une erreur s'est produite lors de la création de l'utilisateur");
         }
     }
