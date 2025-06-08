@@ -42,7 +42,7 @@ export const event = new Elysia({ prefix: "/event" })
           async ({ body, set, eventController, user }) => {
 
                // Define user as User type
-               const userData = user! as User;
+               const userData = user!  as unknown as User;
 
                // get Response from eventController
                const response = await eventController.create(
@@ -76,7 +76,7 @@ export const event = new Elysia({ prefix: "/event" })
           async ({ set, eventController, user }) => {
 
                // Define user as User type
-               const userData = user! as User;
+               const userData = user!  as unknown as User;
                // get Response from eventController
                const response = await eventController.getAll(userData.id);
                // Set status with status Reponse
@@ -103,7 +103,7 @@ export const event = new Elysia({ prefix: "/event" })
           async ({ set, eventController, user, params }) => {
 
                // Define user as User type
-               const userData = user! as User;
+               const userData = user!  as unknown as User;
                // get Response from eventController
                const response = await eventController.getOneEvent(userData.id, params.id);
                // Set status with status Reponse
@@ -130,7 +130,7 @@ export const event = new Elysia({ prefix: "/event" })
           async ({ set, eventController, user, params }) => {
 
                // Define user as User type
-               const userData = user! as User;
+               const userData = user!  as unknown as User;
                // get Response from eventController
                const response = await eventController.getAllParticipantsForEvent(params.id, userData.id);
                // Set status with status Reponse
@@ -159,7 +159,7 @@ export const event = new Elysia({ prefix: "/event" })
           async ({ body, set, eventController, user, params }) => {
 
                // Define user as User type
-               const userData = user! as User;
+               const userData = user!  as unknown as User;
 
                if (userData.id !== body.id_user) {
                     // get Response from eventController
