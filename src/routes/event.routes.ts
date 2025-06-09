@@ -1,179 +1,134 @@
 // ! IMPORTS
 import { Elysia, t } from "elysia";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
-import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
-import { User } from "../models/User";
 import { eventModel } from "../models/Event";
-import { EventController } from "../controllers/event.controller";
+import { EventServices } from "../services/event/event.services";
+import { handleError, throwError } from "../lib/utils/errorHandler/errorHandler";
+import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
 
 // Create Event Route
 export const event = new Elysia({ prefix: "/event" })
-     // ! CONFIGURATION
-     // Declare controller Class
-     .decorate("eventController", new EventController())
-
-     // ! Error Handler
-     .onError(({ code, error }) => {
-          // If Error is an instance of ValidationError
-          if (code === "VALIDATION")
-               // Throw Error
-               return { status: error.status, error: error.message };
-     })
-
-     // ? Use jwtConfig
-     .use(jwtConfig)
-
-     // HANDLER
-
-     // ? Use Plugin for check if user is logged
+     .decorate("eventServices", new EventServices())
      .use(authPlugin)
-
-     // Import model for user
      .use(eventModel)
 
-     // ! ROUTES
-
-     // ? Post event
      .post(
-          // - Path
           "/create",
+          async (ctx) => {
+               try {
 
-          // - Function
-          async ({ body, set, eventController, user }) => {
+                    const eventId = await ctx.eventServices.create(ctx.user.id, ctx.body);
+                    return sendResponse(ctx, 201, { eventId });
 
-               // Define user as User type
-               const userData = user!  as unknown as User;
+               } catch (err) {
 
-               // get Response from eventController
-               const response = await eventController.create(
-                    userData.id,
-                    body
-               );
-
-               // Set status with status Reponse
-               set.status = response.status;
-
-               // Return response
-               return response;
+                    const { status, error: errorResponse } = handleError(err);
+                    throw ctx.error(status, errorResponse);
+               }
           },
 
-          // - VALIDATION
           {
                detail: {
                     tags: ['Event'],
-                    summary: 'Request for create event'
+                    summary: 'Create an event and add the creator as a participant with admin role',
                },
                body: 'create',
-
           }
      )
 
      .get(
-          // - Path
           "/getAll",
+          async (ctx) => {
+               try {
 
-          // - Function
-          async ({ set, eventController, user }) => {
+                    const events = await ctx.eventServices.findAllUserEvent(ctx.user.id);
+                    return sendResponse(ctx, 200, events);
 
-               // Define user as User type
-               const userData = user!  as unknown as User;
-               // get Response from eventController
-               const response = await eventController.getAll(userData.id);
-               // Set status with status Reponse
-               set.status = response.status;
-               // Return response
-               return response;
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
 
-          // - VALIDATION
           {
-               // For swagger
                detail: {
                     tags: ['Event'],
-                    summary: 'Get all events'
+                    summary: 'Find all events for a user',
                }
           }
      )
 
      .get(
-          // - Path
           "/getOneEvent/:id",
+          async (ctx) => {
+               try {
 
-          // - Function
-          async ({ set, eventController, user, params }) => {
+                    const event = await ctx.eventServices.findOneEvent(ctx.user.id, ctx.params.id);
+                    return sendResponse(ctx, 200, event);
 
-               // Define user as User type
-               const userData = user!  as unknown as User;
-               // get Response from eventController
-               const response = await eventController.getOneEvent(userData.id, params.id);
-               // Set status with status Reponse
-               set.status = response.status;
-               // Return response
-               return response;
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
+
           {
                params: t.Object({
                     id: t.String({ format: "uuid", error: "L'id doit être un uuid" }),
                }),
                detail: {
                     tags: ['Event'],
-                    summary: 'Get one event'
+                    summary: 'Find information about a specific event',
                }
           }
      )
 
      .get(
-          // - Path
           "/getAllParticipantsForEvent/:id",
+          async (ctx) => {
+               try {
 
-          // - Function
-          async ({ set, eventController, user, params }) => {
+                    const participants = await ctx.eventServices.getAllParticipantsForEvent(ctx.user.id, ctx.params.id);
+                    return sendResponse(ctx, 200, participants);
 
-               // Define user as User type
-               const userData = user!  as unknown as User;
-               // get Response from eventController
-               const response = await eventController.getAllParticipantsForEvent(params.id, userData.id);
-               // Set status with status Reponse
-               set.status = response.status;
-               // Return response
-               return response;
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
-
-          // - VALIDATION
           {
                params: t.Object({
                     id: t.String({ format: "uuid", error: "L'id doit être un uuid" }),
                }),
                detail: {
                     tags: ['Event'],
-                    summary: 'Get all participants for event'
+                    summary: 'Get all participants for a specific event',
                }
           }
      )
 
      .patch(
-          // - Path
           "/updateParticipant",
+          async (ctx) => {
+               try {
 
-          // - Function
-          async ({ body, set, eventController, user, params }) => {
+                    if (ctx.user.id === ctx.body.id_user) {
+                         throw throwError(400, "Vous ne pouvez pas modifier votre propre rôle");
+                    }
 
-               // Define user as User type
-               const userData = user!  as unknown as User;
+                    await ctx.eventServices.updateParticipant(ctx.body, ctx.user.id);
+                    return sendResponse(ctx, 200, "Participant modifié avec succès");
 
-               if (userData.id !== body.id_user) {
-                    // get Response from eventController
-                    const response = await eventController.updateParticipant(body.id_event, body.id_user, body.id_role, userData.id);
-                    // Set status with status Reponse
-                    set.status = response.status;
-                    // Return response
-                    return response;
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
                }
-               return { status: 400, error: "Vous ne pouvez pas vous modifier" };
-
           },
 
-          // - VALIDATION
           {
                body: t.Object({
                     id_user: t.String({ format: "uuid", error: "L'id doit être un uuid" }),
@@ -185,4 +140,5 @@ export const event = new Elysia({ prefix: "/event" })
                     summary: 'Update participant for event'
                }
           }
-     )
+     );
+
