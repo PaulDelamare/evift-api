@@ -1,107 +1,94 @@
 // ! IMPORTS
-import { Elysia, t } from "elysia";
-import { AuthController } from "../controllers/auth.controller";
+import { Elysia } from "elysia";
 import { userModel } from "../models/User";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { ACCESS_TOKEN_EXP } from "../config/auth-config";
 import { getExpTimestamp } from "../lib/utils/getExpTimestamp";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
+import { AuthServices } from "../services/auth/auth.services";
+import { handleError } from "../lib/utils/errorHandler/errorHandler";
+import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
 
 export const auth = new Elysia({ prefix: "/auth" })
-  // ! CONFIGURATION
 
-  // Import model for user
-  .use(userModel)
+     .use(userModel)
 
-  // Declare controller Class
-  .decorate('authController', new AuthController())
+     // Declare AuthServices as a dependency
+     .decorate('authServices', new AuthServices())
 
-  // ! Error Handler
-  .onError(({ code, error }) => {
-    if (code === 'VALIDATION')
-      return {  status: error.status, error: error };
-  })
+     .use(jwtConfig)
 
-  .use(jwtConfig)
+     .post(
+          "/login",
 
-  // ! ROUTES
-  .post(
-    "/login",
+          async (ctx) => {
 
-    async ({ authController, body, jwt, cookie: { accessToken }, set }) => {
+               try {
+                    const user = await ctx.authServices.login(ctx.body);
 
-      const response = await authController.login(body);
+                    const accessJWTToken = await ctx.jwt.sign({
+                         sub: user.id,
+                         exp: getExpTimestamp(ACCESS_TOKEN_EXP),
+                    });
 
-      set.status = response.status;
+                    ctx.cookie.accessToken.set({
+                         value: accessJWTToken,
+                         httpOnly: true,
+                         maxAge: ACCESS_TOKEN_EXP,
+                         path: "/",
+                    });
 
-      if ('error' in response) {
-        return response;
-      }
+                    return sendResponse(ctx, 200, { user, accessToken: accessJWTToken });
 
-      const user = response.data;
+               } catch (err) {
+                    const { status, error: errorResponse } = handleError(err);
 
-      // create access token
-      const accessJWTToken = await jwt.sign({
-        sub: user.id,
-        exp: getExpTimestamp(ACCESS_TOKEN_EXP),
-      });
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               body: 'login',
+               detail: {
+                    tags: ['Auth'],
+                    summary: 'Requête qui permet la connexion d\'un utilisateur',
+               }
+          }
+     )
 
-      // set access token cookie
-      accessToken.set({
-        value: accessJWTToken,
-        httpOnly: true,
-        maxAge: ACCESS_TOKEN_EXP,
-        path: "/",
-      });
+     .post(
+          "/register",
+          async (ctx) => {
+               try {
+                    await ctx.authServices.register(ctx.body);
 
-      return {
-        message: "Connexion réussie",
-        data: {
-          user: user,
-          accessToken: accessJWTToken,
-          status: 200
-        },
-      };
-    },
-    {
-      body: 'login',
-      detail: {
-        tags: ['Auth'],
-        summary: 'For login register'
-      }
-    }
-  )
+                    return sendResponse(ctx, 201, "Utilisateur créé avec succès");
 
-  .post(
-    "/register",
-    async ({ authController, body, set }) => {
+               } catch (err) {
 
-      const response = await authController.register(body);
+                    const { status, error: errorResponse } = handleError(err);
 
-      set.status = response.status;
+                    throw ctx.error(status, errorResponse);
+               }
+          },
 
-      return response;
-    },
+          {
+               body: 'user',
+               detail: {
+                    tags: ['Auth'],
+                    summary: 'Requête qui permet l\'inscription d\'un utilisateur',
+               }
+          })
 
-    {
-      body: 'user',
-      detail: {
-        tags: ['Auth'],
-        summary: 'For login user'
-      }
-    })
+     // ? Use Plugin for check if user is logged 
+     .use(authPlugin)
 
-  // ? Use Plugin for check if user is logged 
-  .use(authPlugin)
+     .get('/me', ({ user }) => {
 
-  // ? Get current user
-  .get('/me', ({ user }) => {
-
-    return user
-  },
-    {
-      detail: {
-        tags: ['Auth'],
-        summary: 'Get current user information if is logged'
-      }
-    })
+          return user
+     },
+          {
+               detail: {
+                    tags: ['Auth'],
+                    summary: 'Récupère les informations de l\'utilisateur connecté',
+               }
+          })
