@@ -4,7 +4,7 @@ import { sendEmail } from "../../email/sendEmail";
 import { BaseService } from "../base.services";
 
 /**
- * Service class for Card card operations
+ * Service class for Auth operations
  * @extends BaseService
  */
 export class AuthServices extends BaseService {
