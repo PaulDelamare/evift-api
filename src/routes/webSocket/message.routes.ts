@@ -13,12 +13,10 @@ await mongoose.connect(Bun.env.MONGO_URL!)
 // Create Event Route
 export const message = new Elysia({ prefix: "/ws" })
      // ! CONFIGURATION
-     // Declare controller Class
-     // .decorate("eventController", new EventController())
+
 
      // ! Error Handler
      .onError(({ code, error }) => {
-          // If Error is an instance of ValidationError
           if (code === "VALIDATION")
                // Throw Error
                return { status: error.status, error: error.message };
