@@ -7,7 +7,6 @@ import { JWT_NAME } from "../../config/auth-config";
 const jwtConfig = (app: Elysia) =>
     app
         .use(
-            // Define jwt
             jwt({
                 name: JWT_NAME,
                 secret: Bun.env.JWT_SECRET!,
