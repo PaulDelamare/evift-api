@@ -1,89 +1,58 @@
-// ! IMPORTS
 import { Elysia, t } from "elysia";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
-import { User } from "../models/User";
-import { GiftController } from "../controllers/gift.controller";
 import { giftModel } from "../models/Gift";
+import { GiftServices } from "../services/gift/gift.services";
+import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
+import { handleError } from "../lib/utils/errorHandler/errorHandler";
 
-// Create Gift Route
 export const gift = new Elysia({ prefix: "/gift" })
-     // ! CONFIGURATION
-     // Declare controller Class
-     .decorate("giftController", new GiftController())
 
-     // ! Error Handler
-     .onError(({ code, error }) => {
-          // If Error is an instance of ValidationError
-          if (code === "VALIDATION")
-               // Throw Error
-               return { status: error.status, error: error.message };
-     })
+     .decorate("giftServices", new GiftServices())
 
-     // ? Use jwtConfig
      .use(jwtConfig)
-
-     // HANDLER
-
-     // ? Use Plugin for check if user is logged
      .use(authPlugin)
 
-     // Import model for user
      .use(giftModel)
 
-     // ! ROUTES
-
      .get(
-          // - Path
           "/findAll",
 
-          // - Function
-          async ({ set, giftController, user }) => {
-               // Define user as User type
-               const userData = user! as unknown as User;
+          async (ctx) => {
+               try {
 
-               // get Response from invitationController
-               const response = await giftController.findAll(userData.id);
+                    const lists = await ctx.giftServices.findAll(ctx.user.id);
+                    return sendResponse(ctx, 200, lists);
 
-               // Set status with status Reponse
-               set.status = response.status;
+               } catch (error) {
 
-               // Return response
-               return response;
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
           {
                detail: {
                     tags: ['Gift'],
-                    summary: 'Get all user gift list'
+                    summary: 'Get all user gift lists',
                },
           }
      )
 
-     // ? Post new gift
      .post(
-          // - Path
           "/create",
 
-          // - Function
-          async ({ body, set, giftController, user }) => {
+          async (ctx) => {
+               try {
 
-               // Define user as User type
-               const userData = user! as unknown as User;
+                    await ctx.giftServices.create(ctx.user.id, ctx.body);
+                    return sendResponse(ctx, 200, "Liste de cadeaux créée avec succès");
 
-               // get Response from invitationController
-               const response = await giftController.create(
-                    userData.id,
-                    body
-               );
+               } catch (error) {
 
-               // Set status with status Reponse
-               set.status = response.status;
-
-               // Return response
-               return response;
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
-
-          // - VALIDATION
           {
                detail: {
                     tags: ['Gift'],
@@ -94,28 +63,20 @@ export const gift = new Elysia({ prefix: "/gift" })
      )
 
      .post(
-          // - Path
           "/listEvent",
 
-          // - Function
-          async ({ body, set, giftController, user }) => {
-               // Define user as User type
-               const userData = user! as unknown as User;
+          async (ctx) => {
+               try {
 
-               // get Response from invitationController
-               const response = await giftController.addListEvent(
-                    userData.id,
-                    body
-               );
+                    await ctx.giftServices.addListEvent(ctx.user.id, ctx.body.idEvent, ctx.body.idList);
+                    return sendResponse(ctx, 200, "Liste de cadeaux ajoutée à l'événement avec succès");
 
-               // Set status with status Reponse
-               set.status = response.status;
+               } catch (error) {
 
-               // Return response
-               return response;
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
-
-          // - VALIDATION
           {
                detail: {
                     tags: ['Gift'],
@@ -129,22 +90,19 @@ export const gift = new Elysia({ prefix: "/gift" })
      )
 
      .get(
-          // - Path
           "/findListEvent/:idEvent",
 
-          // - Function
-          async ({ set, giftController, user, params }) => {
-               // Define user as User type
-               const userData = user! as unknown as User;
+          async (ctx) => {
+               try {
 
-               // get Response from invitationController
-               const response = await giftController.findListEvent(userData.id, params.idEvent);
+                    const lists = await ctx.giftServices.findListEvent(ctx.user.id, ctx.params.idEvent);
+                    return sendResponse(ctx, 200, lists);
 
-               // Set status with status Reponse
-               set.status = response.status;
+               } catch (error) {
 
-               // Return response
-               return response;
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
           {
                detail: {
@@ -158,25 +116,20 @@ export const gift = new Elysia({ prefix: "/gift" })
      )
 
      .delete(
-          // - Path
           "/deleteListEvent",
 
-          // - Function
-          async ({ set, giftController, user, body }) => {
-               // Define user as User type
-               const userData = user! as unknown as User;
+          async (ctx) => {
+               try {
 
-               // get Response from invitationController
-               const response = await giftController.removeListEvent(userData.id, body);
+                    const lists = await ctx.giftServices.removeListEvent(ctx.user.id, ctx.body.idEvent, ctx.body.idList);
+                    return sendResponse(ctx, 200, lists);
 
-               // Set status with status Reponse
-               set.status = response.status;
+               } catch (error) {
 
-               // Return response
-               return response;
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
-
-          // - VALIDATION
           {
                detail: {
                     tags: ['Gift'],
@@ -190,22 +143,19 @@ export const gift = new Elysia({ prefix: "/gift" })
      )
 
      .get(
-          // - Path
           "/findList/:idList",
 
-          // - Function
-          async ({ set, giftController, user, params }) => {
-               // Define user as User type
-               const userData = user! as unknown as User;
+          async (ctx) => {
+               try {
 
-               // get Response from invitationController
-               const response = await giftController.findList(userData.id, params.idList);
+                    const lists = await ctx.giftServices.findList(ctx.user.id, ctx.params.idList);
+                    return sendResponse(ctx, 200, lists);
 
-               // Set status with status Reponse
-               set.status = response.status;
+               } catch (error) {
 
-               // Return response
-               return response;
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
           {
                detail: {
@@ -219,26 +169,21 @@ export const gift = new Elysia({ prefix: "/gift" })
      )
 
      .post(
-          // - Path
           "/checkGift",
 
-          // - Function
-          async ({ set, giftController, user, body }) => {
+          async (ctx) => {
 
-               // Define user as User type
-               const userData = user! as unknown as User;
+               try {
 
-               // get Response from invitationController
-               const response = await giftController.checkGift(userData.id, body);
+                    await ctx.giftServices.checkGift(ctx.user.id, ctx.body.idEvent, ctx.body.idGift, ctx.body.checked);
+                    return sendResponse(ctx, 200, "Cadeaux enregistrés avec succès");
 
-               // Set status with status Reponse
-               set.status = response.status;
+               } catch (error) {
 
-               // Return response
-               return response;
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
           },
-
-          // - VALIDATION
           {
                detail: {
                     tags: ['Gift'],
@@ -247,7 +192,7 @@ export const gift = new Elysia({ prefix: "/gift" })
                body: t.Object({
                     idEvent: t.String({ format: "uuid", errors: "L'id de l'evènement n'est pas valide" }),
                     idGift: t.String({ format: "uuid", errors: "L'id du cadeau n'est pas valide" }),
-                    checked: t.Boolean({errors: "La valeur de checked n'est pas valide"})
+                    checked: t.Boolean({ errors: "La valeur de checked n'est pas valide" })
                }),
           }
      )
