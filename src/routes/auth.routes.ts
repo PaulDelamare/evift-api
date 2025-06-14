@@ -50,7 +50,7 @@ export const auth = new Elysia({ prefix: "/auth" })
                body: 'login',
                detail: {
                     tags: ['Auth'],
-                    summary: 'Requête qui permet la connexion d\'un utilisateur',
+                    summary: 'Request to log in a user',
                }
           }
      )
@@ -75,7 +75,7 @@ export const auth = new Elysia({ prefix: "/auth" })
                body: 'user',
                detail: {
                     tags: ['Auth'],
-                    summary: 'Requête qui permet l\'inscription d\'un utilisateur',
+                    summary: 'Request to register a user',
                }
           })
 
@@ -89,6 +89,6 @@ export const auth = new Elysia({ prefix: "/auth" })
           {
                detail: {
                     tags: ['Auth'],
-                    summary: 'Récupère les informations de l\'utilisateur connecté',
+                    summary: 'Request to get the connected user\'s information',
                }
           })
