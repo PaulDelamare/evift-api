@@ -36,7 +36,7 @@ try {
     await main();
 
 } catch (error) {
-    console.log("Une erreur c'est produit, les rôles sont peut être déjà crées");
+    console.error("Une erreur c'est produit, les rôles sont peut être déjà crées");
     process.exit(1);
 } finally {
     await prisma.$disconnect();
