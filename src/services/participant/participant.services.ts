@@ -1,5 +1,6 @@
 import { Event, RoleEvent, User } from "@prisma/client";
 import { BaseService } from "../base.services";
+import { throwError } from "../../lib/utils/errorHandler/errorHandler";
 
 /**
  * Service class for Participant operations
@@ -33,17 +34,23 @@ export class ParticipantServices extends BaseService {
       * @param eventId - The unique identifier of the event.
       * @returns A promise that resolves to the participant record if found, including related event and role reference data; otherwise, null.
       */
-     public async findEventByUserIdAndEventId(id_user: User['id'], id_event: Event['id']) {
-          return await this.db.participant.findFirst({
+     public async findEventByUserIdAndEventId(id_user: User['id'], id_event: Event['id'], event = true, roleRef = true, checkError: null | string = null) {
+          const participant = await this.db.participant.findFirst({
                where: {
                     id_event,
                     id_user
                },
                include: {
-                    event: true,
-                    roleRef: true
+                    event,
+                    roleRef
                }
           });
+
+          if (!participant && typeof checkError === 'string') {
+               throw throwError(401, checkError);
+          }
+
+          return participant;
      }
 
      /**
