@@ -37,7 +37,7 @@ export const friends = new Elysia({ prefix: "/friends" })
         {
             detail: {
                 tags: ['Friends'],
-                summary: 'Send request for add friend to an other user'
+                summary: 'Get all friends of a user',
             },
         }
     );
