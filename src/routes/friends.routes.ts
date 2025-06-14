@@ -2,60 +2,38 @@
 import { Elysia, t } from "elysia";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
-import { User, userModel } from "../models/User";
-import { FriendsController } from "../controllers/friends.controller";
+import { userModel } from "../models/User";
+import { FriendsServices } from "../services/friends/friends.services";
+import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
+import { handleError } from "../lib/utils/errorHandler/errorHandler";
 
 // Create Invitaion Route
 export const friends = new Elysia({ prefix: "/friends" })
-    // ! CONFIGURATION
-    // Declare controller Class
-    .decorate("friendsController", new FriendsController())
 
-    // ! Error Handler
-    .onError(({ code, error }) => {
-        // If Error is an instance of ValidationError
-        if (code === "VALIDATION")
-            // Throw Error
-            return { status: error.status, error: error };
-    })
+    .decorate("friendsServices", new FriendsServices())
 
-    // ? Use jwtConfig
     .use(jwtConfig)
-
-    // HANDLER
-
-    // ? Use Plugin for check if user is logged
     .use(authPlugin)
 
-    // Import model for user
     .use(userModel)
 
-    // ! ROUTES
 
-    // ? Post request friends invitation
     .get(
-        // - Path
         "/findAll",
 
-        // - Function
-        async ({ set, friendsController, user }) => {
+        async (ctx) => {
+            try {
 
-            // Define user as User type
-            const userData = user!  as unknown as User;
+                const friends = await ctx.friendsServices.findAll(ctx.user.id);
+                return sendResponse(ctx, 200, friends);
 
-            // get Response from invitationController
-            const response = await friendsController.findAll(
-                userData.id
-            );
+            } catch (error) {
 
-            // Set status with status Reponse
-            set.status = response.status;
-
-            // Return response
-            return response;
+                const { status, error: errorResponse } = handleError(error);
+                throw ctx.error(status, errorResponse);
+            }
         },
 
-        // - VALIDATION
         {
             detail: {
                 tags: ['Friends'],
