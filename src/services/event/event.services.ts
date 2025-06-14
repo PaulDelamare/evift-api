@@ -66,19 +66,11 @@ export class EventServices extends BaseService {
 
           const events = await this.db.participant.findMany({
                where: {
-                    event: {
-                         date: {
-                              gt: now
-                         },
-                    },
+                    event: { date: { gt: now }, },
                     id_user
 
                },
-               orderBy: {
-                    event: {
-                         date: 'asc'
-                    }
-               },
+               orderBy: { event: { date: 'asc' } },
                include: {
                     user: {
                          select: {
@@ -102,6 +94,7 @@ export class EventServices extends BaseService {
                     }
                }
           });
+
           return events
      }
 
@@ -137,7 +130,7 @@ export class EventServices extends BaseService {
           const event = await this.participantServices.findEventByUserIdAndEventId(id_user, id_event);
 
           if (!event) {
-                  throw throwError(404, "Événement introuvable ou vous n'êtes pas un participant de cet événement");
+               throw throwError(404, "Événement introuvable ou vous n'êtes pas un participant de cet événement");
           }
 
           const participants = await this.participantServices.findAllParticipantByEventId(id_event);
