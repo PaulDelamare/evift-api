@@ -64,7 +64,7 @@ export async function sendEmail(
             }
         },
         json: (context: any) => JSON.stringify(context, null, 2),
-        log: (context: any) => { console.log(context); return ''; },
+        log: (context: any) => { console.info(context); return ''; },
         getNameRole: (index: number) => data.roles?.[index]?.name,
         getByRoleId: (index: number) => data.roles?.[index]?._id,
         siteUrl: () => process.env.SITE_URL,
