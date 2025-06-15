@@ -1,5 +1,6 @@
 import { Friends } from "@prisma/client";
 import { BaseService } from "../base.services";
+import { throwError } from "../../lib/utils/errorHandler/errorHandler";
 
 /**
  * Service class for Friend operations
@@ -78,6 +79,54 @@ export class FriendsServices extends BaseService {
                          user: friend.user
                     };
                }
+          });
+     }
+
+     /**
+      * Checks if two users are already friends in the database.
+      *
+      * @param userId - The ID of the first user.
+      * @param id - The ID of the second user to check friendship with.
+      * @param checkError - If true, throws an error if the users are already friends. Defaults to true.
+      * @throws Throws a 400 error if the users are already friends and `checkError` is true.
+      * @returns Resolves if the users are not friends or if `checkError` is false.
+      */
+     public async checkAlreadyFriends(userId: string, id: string, checkError = true) {
+          const friend = await this.db.friends.findFirst({
+               where: {
+                    OR: [
+                         {
+                              user1Id: userId,
+                              user2Id: id,
+                         },
+                         {
+                              user1Id: id,
+                              user2Id: userId,
+                         },
+                    ],
+               },
+          });
+
+          if (friend && checkError) {
+               throw throwError(400, "Vous êtes déjà amis avec cet utilisateur");
+          }
+
+          return friend;
+     }
+
+     /**
+      * Adds a new friend relationship between two users.
+      *
+      * @param userId - The ID of the first user (the one initiating the friend request).
+      * @param id - The ID of the second user (the one being added as a friend).
+      * @returns A promise that resolves when the friend relationship has been created.
+      */
+     public async addFriends(userId: string, id: string) {
+          await this.db.friends.create({
+               data: {
+                    user1Id: userId,
+                    user2Id: id,
+               },
           });
      }
 }
