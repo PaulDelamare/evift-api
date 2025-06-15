@@ -1,4 +1,3 @@
-import { Event, RoleEvent, User } from "@prisma/client";
 import { BaseService } from "../base.services";
 import { throwError } from "../../lib/utils/errorHandler/errorHandler";
 
@@ -16,7 +15,7 @@ export class ParticipantServices extends BaseService {
       * @param idRole - The unique identifier of the role assigned to the participant for the event.
       * @returns A promise that resolves when the participant has been successfully added.
       */
-     public async addNewParticipant(eventId: Event['id'], idUser: User['id'], idRole: RoleEvent['id']) {
+     public async addNewParticipant(eventId: string, idUser: string, idRole: string) {
 
           await this.db.participant.create({
                data: {
@@ -34,7 +33,7 @@ export class ParticipantServices extends BaseService {
       * @param eventId - The unique identifier of the event.
       * @returns A promise that resolves to the participant record if found, including related event and role reference data; otherwise, null.
       */
-     public async findEventByUserIdAndEventId(id_user: User['id'], id_event: Event['id'], event = true, roleRef = true, checkError: null | string = null) {
+     public async findParticipantByUserIdAndEventId(id_user: string, id_event: string, event = true, roleRef = true, checkError: null | string = null) {
           const participant = await this.db.participant.findFirst({
                where: {
                     id_event,
@@ -59,7 +58,7 @@ export class ParticipantServices extends BaseService {
       * @param id_event - The unique identifier of the event to find participants for.
       * @returns A promise that resolves to an array of participants, each including selected user information and their role reference.
       */
-     public async findAllParticipantByEventId(id_event: Event['id']) {
+     public async findAllParticipantByEventId(id_event: string) {
 
           return await this.db.participant.findMany({
                where: {
@@ -86,7 +85,7 @@ export class ParticipantServices extends BaseService {
       * @param id_event - The unique identifier of the event.
       * @returns A promise that resolves to the participant object if found, including the related role reference, or null if not found.
       */
-     public async findOneParticipant(id_user: User['id'], id_event: Event['id']) {
+     public async findOneParticipant(id_user: string, id_event: string) {
           return await this.db.participant.findFirst({
                where: {
                     id_event,
