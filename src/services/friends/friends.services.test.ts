@@ -1,5 +1,5 @@
 import { Friends } from '@prisma/client';
-import { describe, it, expect } from 'bun:test';
+import { describe, it, expect, beforeEach } from 'bun:test';
 import { FriendsServices } from './friends.services';
 
 describe('FriendsServices.findAll', () => {
@@ -134,6 +134,87 @@ describe('FriendsServices.transformFriendsArray', () => {
           const result = await (service as any).transformFriendsArray(input, 'u-unknown');
 
           expect(result).toEqual([undefined]);
+     });
+});
+
+describe('FriendsServices.checkAlreadyFriends', () => {
+     it('should resolve when no friendship exists and default checkError is true', async () => {
+          const dbStub = {
+               friends: {
+                    findFirst: async (args: any) => null,
+               },
+          };
+          const service = new FriendsServices(dbStub as any);
+
+            expect(service.checkAlreadyFriends('userA', 'userB')).resolves.toBeNull();
+     });
+
+     it('should throw a 400 error when friendship exists and checkError is true', async () => {
+          const mockFriend = { user1Id: 'userA', user2Id: 'userB' };
+          const dbStub = {
+               friends: {
+                    findFirst: async (args: any) => mockFriend,
+               },
+          };
+          const service = new FriendsServices(dbStub as any);
+
+          expect(service.checkAlreadyFriends('userA', 'userB')).rejects.toMatchObject({
+               status: 400,
+               error: {
+                    error: "Vous êtes déjà amis avec cet utilisateur",
+               },
+          });
+     });
+
+     it('should resolve when friendship exists but checkError is false', async () => {
+          const mockFriend = { user1Id: 'userA', user2Id: 'userB' };
+          const dbStub = {
+               friends: {
+                    findFirst: async (args: any) => mockFriend,
+               },
+          };
+          const service = new FriendsServices(dbStub as any);
+
+          // @ts-ignore
+          expect(service.checkAlreadyFriends('userA', 'userB', false)).resolves.toEqual({
+               user1Id: 'userA',
+               user2Id: 'userB',
+          });
+     });
+});
+
+
+describe('FriendsServices.addFriends', () => {
+     let service: FriendsServices;
+     let dbStub: any;
+
+     beforeEach(() => {
+          dbStub = {
+               friends: {
+                    create: async (args: any) => null,
+               },
+          };
+          service = new FriendsServices(dbStub);
+     });
+
+     it('🚀 devrait appeler db.friends.create avec user1Id et user2Id corrects', async () => {
+          let receivedData: any = null;
+          dbStub.friends.create = async ({ data }: any) => {
+               receivedData = data;
+               return { id: 'new-friend', ...data };
+          };
+
+          await service.addFriends('userA', 'userB');
+
+          expect(receivedData).toEqual({
+               user1Id: 'userA',
+               user2Id: 'userB',
+          });
+     });
+
+     it('🚀 devrait résoudre la promesse sans renvoyer de valeur', async () => {
+          // Par défaut, create renvoie null, donc addFriends doit simplement résoudre
+          expect(service.addFriends('userX', 'userY')).resolves.toBeUndefined();
      });
 });
 
