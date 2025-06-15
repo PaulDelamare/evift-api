@@ -161,7 +161,7 @@ export class GiftServices extends BaseService {
           idList: string
      ): Promise<void> {
 
-          const participant = await this.participantServices.findEventByUserIdAndEventId(
+          const participant = await this.participantServices.findParticipantByUserIdAndEventId(
                idUser,
                idEvent,
                false
@@ -194,7 +194,7 @@ export class GiftServices extends BaseService {
       */
      public async findListEvent(idUser: string, idEvent: string): Promise<ListEvent[]> {
 
-          await this.participantServices.findEventByUserIdAndEventId(idUser, idEvent, false, false, 'Vous ne participez pas à cet évènement');
+          await this.participantServices.findParticipantByUserIdAndEventId(idUser, idEvent, false, false, 'Vous ne participez pas à cet évènement');
 
           const adminRole = await this.roleEventServices.findRoleEvent('admin');
 
@@ -220,7 +220,7 @@ export class GiftServices extends BaseService {
       */
      public async removeListEvent(idUser: string, idEvent: string, idList: string): Promise<void> {
 
-          const participant = (await this.participantServices.findEventByUserIdAndEventId(idUser, idEvent, false, true, 'Vous ne pouvez pas enlever des cadeaux à cet évènement'))!
+          const participant = (await this.participantServices.findParticipantByUserIdAndEventId(idUser, idEvent, false, true, 'Vous ne pouvez pas enlever des cadeaux à cet évènement'))!
 
           const listEventParticipant = await this.listEventServices.findOneListByParticipantAndList(participant.id, idList, true);
 
@@ -239,7 +239,7 @@ export class GiftServices extends BaseService {
 
           const list = (await this.listEventServices.findListById(idList))!;
 
-          await this.participantServices.findEventByUserIdAndEventId(idUser, list.id_event, false, false, 'Vous ne pouvez pas voir la liste de cadeaux')
+          await this.participantServices.findParticipantByUserIdAndEventId(idUser, list.id_event, false, false, 'Vous ne pouvez pas voir la liste de cadeaux')
 
           return list
      }
@@ -265,7 +265,7 @@ export class GiftServices extends BaseService {
           const gift = await this.findGiftById(idGift, true);
           const list = await this.listEventServices.findListByListIdAndEventId(gift!.id_list, idEvent, true);
 
-          await this.participantServices.findEventByUserIdAndEventId(
+          await this.participantServices.findParticipantByUserIdAndEventId(
                userId,
                list!.id_event,
                false,
