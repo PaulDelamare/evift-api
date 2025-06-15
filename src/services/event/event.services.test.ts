@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'bun:test';
+import { describe, it, expect, beforeEach } from 'bun:test';
 import type { Event, User } from '@prisma/client';
 import { EventServices } from './event.services';
 
@@ -228,7 +228,7 @@ describe('EventServices.findOneEvent', () => {
                }
           };
           const participantServicesStub = {
-               findEventByUserIdAndEventId: async (id_user: string, id_event: string) => {
+               findParticipantByUserIdAndEventId: async (id_user: string, id_event: string) => {
                     expect(id_user).toBe('user-123');
                     expect(id_event).toBe('event-1');
                     return mockEvent;
@@ -243,7 +243,7 @@ describe('EventServices.findOneEvent', () => {
 
      it('should throw an error if the user is not a participant or event does not exist', async () => {
           const participantServicesStub = {
-               findEventByUserIdAndEventId: async () => null
+               findParticipantByUserIdAndEventId: async () => null
           };
           const service = new EventServices({} as any);
           service.participantServices = participantServicesStub as any;
@@ -296,7 +296,7 @@ describe('EventServices.getAllParticipantsForEvent', () => {
           ];
 
           const participantServicesStub = {
-               findEventByUserIdAndEventId: async (id_user: string, id_event: string) => {
+               findParticipantByUserIdAndEventId: async (id_user: string, id_event: string) => {
                     expect(id_user).toBe('user-123');
                     expect(id_event).toBe('event-1');
                     return mockEvent;
@@ -316,7 +316,7 @@ describe('EventServices.getAllParticipantsForEvent', () => {
 
      it('should throw an error if the user is not a participant or event does not exist', async () => {
           const participantServicesStub = {
-               findEventByUserIdAndEventId: async () => null,
+               findParticipantByUserIdAndEventId: async () => null,
                findAllParticipantByEventId: async () => []
           };
 
@@ -497,6 +497,58 @@ describe('EventServices.updateParticipant', () => {
           service.participantServices = participantServicesStub as any;
           service.roleEventServices = roleEventServicesStub as any;
 
-          await expect(service.updateParticipant(validatedData, 'admin-user')).rejects.toThrow('DB error');
+          expect(service.updateParticipant(validatedData, 'admin-user')).rejects.toThrow('DB error');
+     });
+});
+
+describe('EventServices.findEventById', () => {
+     let service: EventServices;
+     let dbStub: any;
+     const now = new Date();
+     const mockEvent = {
+          id: 'evt1',
+          name: 'Conférence',
+          description: 'Tech Talk',
+          address: 'Paris',
+          date: now,
+          time: '10:00',
+          userId: 'org1',
+          createdAt: now,
+          updatedAt: now,
+     };
+
+     beforeEach(() => {
+          dbStub = {
+               event: {
+                    findUnique: async () => null,
+               },
+          };
+          service = new EventServices(dbStub);
+     });
+
+     it('🚀 devrait retourner l’événement si trouvé', async () => {
+          dbStub.event.findUnique = async (args: any) => {
+               expect(args.where).toEqual({ id: 'evt1' });
+               return mockEvent;
+          };
+
+          const result = await service.findEventById('evt1');
+          expect(result).toEqual(mockEvent);
+     });
+
+     it('🚀 devrait lever une erreur 404 si non trouvé et checkError=true', async () => {
+          dbStub.event.findUnique = async () => null;
+          expect(service.findEventById('unknown')).rejects.toMatchObject({
+               status: 404,
+               error: {
+                    error: "Événement introuvable",
+               },
+          });
+     });
+
+     it('🚀 devrait retourner null si non trouvé et checkError=false', async () => {
+          dbStub.event.findUnique = async () => null;
+          const result = await service.findEventById('unknown', false);
+          expect(result).toBeNull();
      });
 });
