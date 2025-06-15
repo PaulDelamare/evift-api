@@ -4,7 +4,7 @@ import { Participant, RoleEvent } from '@prisma/client';
 import { throwError } from '../../lib/utils/errorHandler/errorHandler';
 
 class FakeParticipantServices {
-     findEventByUserIdAndEventId = async (_user: string, _evt: string, _req: boolean, _roleRef: boolean, errorMsg?: string) => {
+     findParticipantByUserIdAndEventId = async (_user: string, _evt: string, _req: boolean, _roleRef: boolean, errorMsg?: string) => {
           throw throwError(401, errorMsg || "Vous ne participez pas à cet évènement");
      };
 }
@@ -246,7 +246,7 @@ describe('GiftServices.addListEvent', () => {
      });
 
      it('should throw 401 object if participant role is not admin or gift', async () => {
-          (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
                id: 'p1',
                roleRef: { name: 'viewer' },
           } as Participant & any);
@@ -259,7 +259,7 @@ describe('GiftServices.addListEvent', () => {
      });
 
      it('should call sub-services in order when participant valid', async () => {
-          (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
                id: 'p2',
                roleRef: { name: 'admin' },
           } as Participant & any);
@@ -283,7 +283,7 @@ describe('GiftServices.addListEvent', () => {
      });
 
      it('should propagate error from findOneListGift', async () => {
-          (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
                id: 'p3',
                roleRef: { name: 'gift' },
           } as Participant & any);
@@ -294,7 +294,7 @@ describe('GiftServices.addListEvent', () => {
      });
 
      it('should propagate error from checkIfListInEvent', async () => {
-          (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
                id: 'p4',
                roleRef: { name: 'gift' },
           } as Participant & any);
@@ -306,7 +306,7 @@ describe('GiftServices.addListEvent', () => {
      });
 
      it('should propagate error from addListEvent', async () => {
-          (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
                id: 'p5',
                roleRef: { name: 'admin' },
           } as Participant & any);
@@ -341,7 +341,7 @@ describe('GiftServices.findListEvent', () => {
 
      it('should return list events on success', async () => {
           // Remplacer le comportement par défaut pour renvoyer un participant valide
-          (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
                id: 'participant-1',
                roleRef: { name: 'admin' }
           });
@@ -396,7 +396,7 @@ describe('GiftServices.findListEvent', () => {
 
      it('should throw 401 if user does not participate', async () => {
           const errMsg = 'Vous ne participez pas à cet évènement';
-          (participantServices.findEventByUserIdAndEventId as any) = async () => {
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => {
                throw throwError(401, errMsg);
           };
 
@@ -405,7 +405,7 @@ describe('GiftServices.findListEvent', () => {
      });
 
      it('should propagate error from findRoleEvent', async () => {
-          (participantServices.findEventByUserIdAndEventId as any) = async () => { };
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => { };
           (roleEventServices.findRoleEvent as any) = async () => {
                throw new Error('Role lookup failure');
           };
@@ -415,7 +415,7 @@ describe('GiftServices.findListEvent', () => {
      });
 
      it('should propagate error from findAllListEventByEventId', async () => {
-          (participantServices.findEventByUserIdAndEventId as any) = async () => { };
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => { };
           (roleEventServices.findRoleEvent as any) = async () => ({ id: 'x', name: 'admin', createdAt: new Date() });
           (listEventServices.findAllListEventByEventId as any) = async () => {
                throw new Error('DB query failed');
@@ -457,7 +457,7 @@ describe('GiftServices.removeListEvent', () => {
 
      it('should propagate error from findOneListByParticipantAndList', async () => {
           // Stub participant
-          (participantServices.findEventByUserIdAndEventId as any) = async () => participant;
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => participant;
           // findOneListByParticipantAndList rejette
           (listEventServices.findOneListByParticipantAndList as any) = async () => {
                throw throwError(404, 'Liste de cadeaux introuvable');
@@ -472,7 +472,7 @@ describe('GiftServices.removeListEvent', () => {
 
      it('should call removeListEvent when participant and entry exist', async () => {
           // Stub participant
-          (participantServices.findEventByUserIdAndEventId as any) = async () => participant;
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => participant;
           // Stub findOneList...
           const fakeEntry = { id: 'le-1', id_participant: participant.id, id_list: listId };
           (listEventServices.findOneListByParticipantAndList as any) = async () => fakeEntry;
@@ -488,7 +488,7 @@ describe('GiftServices.removeListEvent', () => {
 
      it('should propagate error from removeListEvent', async () => {
           // Stub participant and findOneList...
-          (participantServices.findEventByUserIdAndEventId as any) = async () => participant;
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => participant;
           (listEventServices.findOneListByParticipantAndList as any) = async () => ({ id: 'le-2' });
           // removeListEvent rejette
           (listEventServices.removeListEvent as any) = async () => {
@@ -558,7 +558,7 @@ describe('GiftServices.findList', () => {
      it('should return list when user has permission', async () => {
           // Configurer les mocks pour le succès
           (listEventServices.findListById as any) = async () => mockListEvent;
-          (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
                id: 'participant-1',
                roleRef: { name: 'admin' }
           });
@@ -591,8 +591,8 @@ describe('GiftServices.findList', () => {
 
           // findListById réussit
           (listEventServices.findListById as any) = async () => mockListEvent;
-          // findEventByUserIdAndEventId échoue avec 401
-          (participantServices.findEventByUserIdAndEventId as any) = async () => {
+          // findParticipantByUserIdAndEventId échoue avec 401
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => {
                throw throwError(401, errMsg);
           };
 
@@ -603,11 +603,11 @@ describe('GiftServices.findList', () => {
                });
      });
 
-     it('should propagate error from findEventByUserIdAndEventId', async () => {
+     it('should propagate error from findParticipantByUserIdAndEventId', async () => {
           // findListById réussit
           (listEventServices.findListById as any) = async () => mockListEvent;
-          // findEventByUserIdAndEventId génère une erreur
-          (participantServices.findEventByUserIdAndEventId as any) = async () => {
+          // findParticipantByUserIdAndEventId génère une erreur
+          (participantServices.findParticipantByUserIdAndEventId as any) = async () => {
                throw new Error('Participant lookup failure');
           };
 
@@ -741,7 +741,7 @@ describe('GiftServices.checkGift', () => {
             id_list: listId
         });
         
-        (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+        (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
             id: 'participant-1',
             roleRef: { name: 'viewer' }
         });
@@ -766,7 +766,7 @@ describe('GiftServices.checkGift', () => {
             id_list: listId
         });
         
-        (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+        (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
             id: 'participant-1',
             roleRef: { name: 'viewer' }
         });
@@ -808,7 +808,7 @@ describe('GiftServices.checkGift', () => {
             });
     });
 
-    it('should propagate error from findEventByUserIdAndEventId', async () => {
+    it('should propagate error from findParticipantByUserIdAndEventId', async () => {
         (service.findGiftById as any) = async () => mockGift;
         
         (listEventServices.findListByListIdAndEventId as any) = async () => ({
@@ -817,7 +817,7 @@ describe('GiftServices.checkGift', () => {
             id_list: listId
         });
         
-        (participantServices.findEventByUserIdAndEventId as any) = async () => {
+        (participantServices.findParticipantByUserIdAndEventId as any) = async () => {
             throw throwError(401, 'Vous ne pouvez pas voir la liste de cadeaux');
         };
 
@@ -837,7 +837,7 @@ describe('GiftServices.checkGift', () => {
             id_list: listId
         });
         
-        (participantServices.findEventByUserIdAndEventId as any) = async () => ({
+        (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
             id: 'participant-1',
             roleRef: { name: 'viewer' }
         });
