@@ -41,7 +41,7 @@ describe('ParticipantServices.addNewParticipant', () => {
      });
 });
 
-describe('ParticipantServices.findEventByUserIdAndEventId', () => {
+describe('ParticipantServices.findParticipantByUserIdAndEventId', () => {
      it('should call db.participant.findFirst with correct parameters', async () => {
           const mockParticipant = {
                id: 'participant-1',
@@ -89,7 +89,7 @@ describe('ParticipantServices.findEventByUserIdAndEventId', () => {
           const idUser: User['id'] = 'user-5678';
           const idEvent: Event['id'] = 'event-1234';
 
-          const result = await service.findEventByUserIdAndEventId(idUser, idEvent);
+          const result = await service.findParticipantByUserIdAndEventId(idUser, idEvent);
 
           expect(result).toEqual(mockParticipant);
      });
@@ -105,7 +105,7 @@ describe('ParticipantServices.findEventByUserIdAndEventId', () => {
           const idUser: User['id'] = 'user-5678';
           const idEvent: Event['id'] = 'event-1234';
 
-          const result = await service.findEventByUserIdAndEventId(idUser, idEvent);
+          const result = await service.findParticipantByUserIdAndEventId(idUser, idEvent);
 
           expect(result).toBeNull();
      });
@@ -122,7 +122,7 @@ describe('ParticipantServices.findEventByUserIdAndEventId', () => {
           const idUser: User['id'] = 'user-5678';
           const idEvent: Event['id'] = 'event-1234';
 
-          expect(service.findEventByUserIdAndEventId(idUser, idEvent)).rejects.toThrow('DB failure');
+          expect(service.findParticipantByUserIdAndEventId(idUser, idEvent)).rejects.toThrow('DB failure');
      });
 });
 
