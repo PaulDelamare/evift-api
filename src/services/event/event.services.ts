@@ -108,7 +108,7 @@ export class EventServices extends BaseService {
       */
      public async findOneEvent(id_user: string, id_event: string) {
 
-          const event = await this.participantServices.findEventByUserIdAndEventId(id_user, id_event);
+          const event = await this.participantServices.findParticipantByUserIdAndEventId(id_user, id_event);
 
           if (!event) {
                throw throwError(404, "Événement introuvable ou vous n'êtes pas un participant de cet événement");
@@ -127,7 +127,7 @@ export class EventServices extends BaseService {
       */
      public async getAllParticipantsForEvent(id_user: string, id_event: string) {
 
-          const event = await this.participantServices.findEventByUserIdAndEventId(id_user, id_event);
+          const event = await this.participantServices.findParticipantByUserIdAndEventId(id_user, id_event);
 
           if (!event) {
                throw throwError(404, "Événement introuvable ou vous n'êtes pas un participant de cet événement");
@@ -179,5 +179,25 @@ export class EventServices extends BaseService {
                where: { id: targetParticipant.id },
                data: { id_role: validatedData.id_role }
           });
+     }
+
+     /**
+      * Retrieves an event by its unique identifier.
+      *
+      * @param id - The unique identifier of the event to retrieve.
+      * @param checkError - If true, throws a 404 error when the event is not found. Defaults to true.
+      * @returns A promise that resolves to the event object if found, or null if not found and `checkError` is false.
+      * @throws {HttpError} Throws a 404 error if the event is not found and `checkError` is true.
+      */
+     public async findEventById(id: string, checkError = true) {
+          const event = await this.db.event.findUnique({
+               where: { id }
+          });
+
+          if (!event && checkError) {
+               throw throwError(404, "Événement introuvable");
+          }
+
+          return event;
      }
 }
