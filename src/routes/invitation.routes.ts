@@ -1,6 +1,5 @@
 // ! IMPORTS
 import { Elysia, t } from "elysia";
-import { InvitationController } from "../controllers/invitation.controller";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
 import { User } from "../models/User";
@@ -12,7 +11,6 @@ import { EventInvitationServices } from "../services/eventInvitation/eventInvita
 // Create Invitaion Route
 export const invite = new Elysia({ prefix: "/invitation" })
 
-     .decorate("invitationController", new InvitationController())
      .decorate("invitationServices", new InvitationServices())
      .decorate("eventInvitationServices", new EventInvitationServices())
 
