@@ -29,4 +29,31 @@ export class UserServices extends BaseService {
 
           return user;
      }
+
+
+     /**
+      * Finds a user by their email address.
+      *
+      * @param email - The email address of the user to find.
+      * @returns A promise that resolves to the user object containing `id`, `email`, `firstname`, and `lastname`
+      *          if found, or an error object with status 400 if the user is not found.
+      */
+     public async findUserByEmail(email: string) {
+
+          const user = await this.db.user.findUnique({
+               where: { email: email },
+               select: {
+                    id: true,
+                    email: true,
+                    firstname: true,
+                    lastname: true
+               },
+          });
+
+          if (!user) {
+               return { status: 400, error: "L'adresse email ou le mot de passe est incorrect" };
+          }
+
+          return user
+     }
 }
