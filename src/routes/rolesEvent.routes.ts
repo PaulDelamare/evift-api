@@ -1,13 +1,11 @@
 import { Elysia, t } from "elysia";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
-import { RolesController } from "../controllers/roles.controller";
 import { RoleEventServices } from "../services/roleEvent/roleEvent.services";
 import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
 import { handleError } from "../lib/utils/errorHandler/errorHandler";
 
 export const rolesEvent = new Elysia({ prefix: "/rolesEvent" })
-     .decorate("roleController", new RolesController())
      .decorate("roleServices", new RoleEventServices())
 
 
