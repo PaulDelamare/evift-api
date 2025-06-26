@@ -1,4 +1,3 @@
-// ! IMPORTS
 import { Elysia, t } from "elysia";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { eventModel } from "../models/Event";
@@ -6,7 +5,6 @@ import { EventServices } from "../services/event/event.services";
 import { handleError, throwError } from "../lib/utils/errorHandler/errorHandler";
 import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
 
-// Create Event Route
 export const event = new Elysia({ prefix: "/event" })
      .decorate("eventServices", new EventServices())
      .use(authPlugin)
