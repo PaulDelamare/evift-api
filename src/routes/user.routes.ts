@@ -1,55 +1,34 @@
-// ! IMPORTS
 import { Elysia, t } from "elysia";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
-import { UserController } from "../controllers/user.controller";
+import { UserServices } from "../services/user/user.services";
+import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
+import { handleError } from "../lib/utils/errorHandler/errorHandler";
 
-// Create User Route
 export const user = new Elysia({ prefix: "/user" })
-    // ! CONFIGURATION
 
-    // Declare controller Class
-    .decorate("userController", new UserController())
+    .decorate("userServices", new UserServices())
 
-    // ! Error Handler
-    .onError(({ code, error }) => {
-        // If Error is an instance of ValidationError
-        if (code === "VALIDATION")
-            // Throw Error
-            return { status: error.status, error: error };
-    })
-
-    // ? Use jwtConfig
     .use(jwtConfig)
-
-    // HANDLER
-
-    // ? Use Plugin for check if user is logged
     .use(authPlugin)
 
-    // ! ROUTES
-
-    // ? Get user by email
     .get(
-        // - Path
         "/findUser/:email",
 
-        // - Function
-        async ({ userController, params: { email }, set }) => {
+        async (ctx) => {
 
-            // get Response from register method
-            const response = await userController.findByEmail(email);
+            try {
 
-            // Set status with status Reponse
-            set.status = response.status;
+                const roles = await ctx.userServices.findUserByEmail(ctx.params.email);
+                return sendResponse(ctx, 200, roles);
 
-            // Return response
-            return response;
+            } catch (error) {
+
+                const { status, error: errorResponse } = handleError(error);
+                throw ctx.error(status, errorResponse);
+            }
         },
-
-        // - VALIDATION
         {
-            // Params must be an email
             params: t.Object({
                 email: t.String({
                     format: "email",
