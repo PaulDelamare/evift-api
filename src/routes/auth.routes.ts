@@ -1,4 +1,3 @@
-// ! IMPORTS
 import { Elysia } from "elysia";
 import { userModel } from "../models/User";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
@@ -13,7 +12,6 @@ export const auth = new Elysia({ prefix: "/auth" })
 
      .use(userModel)
 
-     // Declare AuthServices as a dependency
      .decorate('authServices', new AuthServices())
 
      .use(jwtConfig)
