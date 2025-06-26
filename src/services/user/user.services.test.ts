@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { UserServices } from './user.services';
+import { User } from '@prisma/client';
 
 describe('UserServices.findUser', () => {
      it('should return the user object when found', async () => {
@@ -49,5 +50,43 @@ describe('UserServices.findUser', () => {
           const result = await service.findUser('non-existent', false);
 
           expect(result).toBeNull();
+     });
+});
+
+describe('UserServices.findUserByEmail', () => {
+     it('should return the user object when found', async () => {
+          const mockUser: Pick<User, 'id' | 'email' | 'firstname' | 'lastname'> = {
+               id: 'user-123',
+               email: 'foo@example.com',
+               firstname: 'Foo',
+               lastname: 'Bar',
+          };
+
+          const dbStub = {
+               user: {
+                    findUnique: async (args: any) => mockUser,
+               },
+          };
+
+          const service = new UserServices(dbStub as any);
+          const result = await service.findUserByEmail('foo@example.com');
+
+          expect(result).toEqual(mockUser);
+     });
+
+     it('should return an error object with status 400 when not found', async () => {
+          const dbStub = {
+               user: {
+                    findUnique: async (args: any) => null,
+               },
+          };
+
+          const service = new UserServices(dbStub as any);
+          const result = await service.findUserByEmail('missing@example.com');
+
+          expect(result).toEqual({
+               status: 400,
+               error: "L'adresse email ou le mot de passe est incorrect",
+          });
      });
 });
