@@ -62,6 +62,7 @@ export const auth = new Elysia({ prefix: "/auth" })
                     return sendResponse(ctx, 201, "Utilisateur créé avec succès");
 
                } catch (err) {
+                    console.error(err);
 
                     const { status, error: errorResponse } = handleError(err);
 
