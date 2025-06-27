@@ -56,4 +56,18 @@ export class UserServices extends BaseService {
 
           return user
      }
+
+     /**
+      * Marks the user's first login as complete by setting the `firstLogin` flag to `false`.
+      *
+      * @param idUser - The unique identifier of the user whose first login status will be updated.
+      * @returns A promise that resolves when the update operation is complete.
+      */
+     public async completeFirstLogin(idUser: string) {
+
+          await this.db.user.update({
+               where: { id: idUser },
+               data: { firstLogin: false }
+          });
+     }
 }
