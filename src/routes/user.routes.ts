@@ -40,4 +40,19 @@ export const user = new Elysia({ prefix: "/user" })
                 summary: 'Find an user by email'
             }
         }
-    );
+    )
+
+    .patch("/firstLogin", async (ctx) => {
+        try {
+
+            await ctx.userServices.completeFirstLogin(ctx.user.id);
+
+            return sendResponse(ctx, 200, "First login completed successfully");
+
+        } catch (error) {
+
+            const { status, error: errorResponse } = handleError(error);
+            throw ctx.error(status, errorResponse);
+
+        }
+    })
