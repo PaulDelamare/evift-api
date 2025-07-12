@@ -175,7 +175,7 @@ export const gift = new Elysia({ prefix: "/gift" })
 
                try {
 
-                    await ctx.giftServices.checkGift(ctx.user.id, ctx.body.idEvent, ctx.body.idGift, ctx.body.checked);
+                    await ctx.giftServices.checkGift(ctx.user.id, ctx.body.eventId, ctx.body.giftId, ctx.body.taken);
                     return sendResponse(ctx, 200, "Cadeaux enregistrés avec succès");
 
                } catch (error) {
@@ -190,9 +190,9 @@ export const gift = new Elysia({ prefix: "/gift" })
                     summary: 'Get all user gift list'
                },
                body: t.Object({
-                    idEvent: t.String({ format: "uuid", errors: "L'id de l'evènement n'est pas valide" }),
-                    idGift: t.String({ format: "uuid", errors: "L'id du cadeau n'est pas valide" }),
-                    checked: t.Boolean({ errors: "La valeur de checked n'est pas valide" })
+                    eventId: t.String({ format: "uuid", errors: "L'id de l'evènement n'est pas valide" }),
+                    giftId: t.String({ format: "uuid", errors: "L'id du cadeau n'est pas valide" }),
+                    taken: t.Boolean({ errors: "La valeur de checked n'est pas valide" })
                }),
           }
      )
