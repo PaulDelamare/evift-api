@@ -25,7 +25,7 @@ export class ListEventServices extends BaseService {
           });
 
           if (listEventParticipant) {
-               throw throwError(401, 'Vous avez déja ajouter ce cadeaux à cet évènement');
+               throw throwError(401, 'Vous avez déjà ajouté ce cadeau à cet événement');
           }
      }
 
