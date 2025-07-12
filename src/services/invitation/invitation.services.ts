@@ -79,7 +79,7 @@ export class InvitationServices extends BaseService {
           });
 
           if (alreadyRequested && checkAlreadyError) {
-               return throwError(400, "Vous avez déjà envoyé une invitation !");
+               throw throwError(400, "Vous avez déjà envoyé une invitation !");
           }
 
           return alreadyRequested;
