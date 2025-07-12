@@ -177,7 +177,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
 
                     const message = await ctx.eventInvitationServices.responseEventInvitation(
                          ctx.user.id,
-                         ctx.body.invitationId,
+                         ctx.body.id,
                          ctx.body.response
                     );
                     return sendResponse(ctx, 200, message);
@@ -188,9 +188,10 @@ export const invite = new Elysia({ prefix: "/invitation" })
                     throw ctx.error(status, errorResponse);
                }
           },
+          
           {
                body: t.Object({
-                    invitationId: t.String({
+                    id: t.String({
                          format: "uuid",
                          error: "L'id de l'evènement est invalide",
                     }),
