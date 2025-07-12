@@ -52,7 +52,7 @@ export class EventInvitationServices extends BaseService {
                false,
                true
           );
-          if (!organizerEvent || organizerEvent.roleRef.name !== "admin") {
+          if (!organizerEvent || (organizerEvent.roleRef.name !== "admin" && organizerEvent.roleRef.name !== "superAdmin")) {
                throw throwError(403, "Vous n'avez pas le droit d'inviter des utilisateurs");
           }
 
