@@ -18,8 +18,8 @@ export const user = new Elysia({ prefix: "/user" })
         async (ctx) => {
 
             try {
-
                 const roles = await ctx.userServices.findUserByEmail(ctx.params.email);
+
                 return sendResponse(ctx, 200, roles);
 
             } catch (error) {
