@@ -7,18 +7,16 @@ import { Message } from "../../schemas/message.model";
 import { bdd } from "../../lib/prisma";
 
 await mongoose.connect(Bun.env.MONGO_URL!)
-     .then(() => console.log("Connected to MongoDB"))
-     .catch((err) => console.log(err));
+     .then(() => console.info("Connected to MongoDB"))
+     .catch((err) => console.info(err));
 
 // Create Event Route
 export const message = new Elysia({ prefix: "/ws" })
      // ! CONFIGURATION
-     // Declare controller Class
-     // .decorate("eventController", new EventController())
+
 
      // ! Error Handler
      .onError(({ code, error }) => {
-          // If Error is an instance of ValidationError
           if (code === "VALIDATION")
                // Throw Error
                return { status: error.status, error: error.message };

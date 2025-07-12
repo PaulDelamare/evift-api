@@ -14,7 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User model
 model User {
   id                  String            @id @unique @default(uuid())
   email               String            @unique
@@ -34,27 +33,27 @@ model User {
   userListGift        ListGift[]
   gifts               Gifts[]           @relation("gift")
   giftsTaken          Gifts[]           @relation("userTaken")
+  firstLogin          Boolean           @default(true)
 }
 
 // Invitation model (Friends Request)
 model Invitation {
   id     String @id @unique @default(uuid())
-  user   User   @relation("invitation", fields: [userId], references: [id])
+  user   User   @relation("invitation", fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
-  request   User   @relation(fields: [requestId], references: [id])
+  request   User   @relation(fields: [requestId], references: [id], onDelete: Cascade)
   requestId String
 
   createdAt DateTime @default(now())
 }
 
-// Friends
 model Friends {
   id      String @id @unique @default(uuid())
-  user    User   @relation("friend1", fields: [user1Id], references: [id])
+  user    User   @relation("friend1", fields: [user1Id], references: [id], onDelete: Cascade)
   user1Id String
 
-  user2   User   @relation("friend2", fields: [user2Id], references: [id])
+  user2   User   @relation("friend2", fields: [user2Id], references: [id], onDelete: Cascade)
   user2Id String
 
   created_at DateTime @default(now())
@@ -74,8 +73,7 @@ model Event {
   address     String
   date        DateTime
   time        String?
-  img         String
-  user        User              @relation(fields: [userId], references: [id])
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
@@ -87,13 +85,13 @@ model Event {
 model Participant {
   id String @id @unique @default(uuid())
 
-  event    Event  @relation(fields: [id_event], references: [id])
+  event    Event  @relation(fields: [id_event], references: [id], onDelete: Cascade)
   id_event String
 
-  roleRef RoleEvent @relation(fields: [id_role], references: [id])
+  roleRef RoleEvent @relation(fields: [id_role], references: [id], onDelete: Cascade)
   id_role String
 
-  user    User   @relation(fields: [id_user], references: [id])
+  user    User   @relation(fields: [id_user], references: [id] , onDelete: Cascade)
   id_user String
 
   eventList ListEvent[]
@@ -105,13 +103,13 @@ model Participant {
 model EventInvitation {
   id String @id @unique @default(uuid())
 
-  event    Event  @relation(fields: [id_event], references: [id])
+  event    Event  @relation(fields: [id_event], references: [id], onDelete: Cascade)
   id_event String
 
-  idUser  User   @relation("userEventInvitation", fields: [id_user], references: [id])
+  idUser  User   @relation("userEventInvitation", fields: [id_user], references: [id], onDelete: Cascade)
   id_user String
 
-  idOrganizer  User   @relation("userEventOrganizer", fields: [id_organizer], references: [id])
+  idOrganizer  User   @relation("userEventOrganizer", fields: [id_organizer], references: [id], onDelete: Cascade)
   id_organizer String
 
   createdAt DateTime @default(now())
@@ -121,7 +119,7 @@ model ListGift {
   id   String @id @unique @default(uuid())
   name String
 
-  user    User   @relation(fields: [id_user], references: [id])
+  user    User   @relation(fields: [id_user], references: [id], onDelete: Cascade)
   id_user String
 
   createdAt DateTime @default(now())
@@ -135,14 +133,14 @@ model Gifts {
   id String @id @unique @default(uuid())
 
   id_list String
-  list    ListGift @relation(fields: [id_list], references: [id])
+  list    ListGift @relation(fields: [id_list], references: [id], onDelete: Cascade)
 
   id_user String
-  user    User   @relation("gift", fields: [id_user], references: [id])
+  user    User   @relation("gift", fields: [id_user], references: [id], onDelete: Cascade)
 
   taken Boolean @default(false)
 
-  userTaken    User?   @relation("userTaken", fields: [id_userTaken], references: [id])
+  userTaken    User?   @relation("userTaken", fields: [id_userTaken], references: [id], onDelete: Cascade)
   id_userTaken String?
 
   name     String
@@ -157,13 +155,13 @@ model ListEvent {
   id String @id @unique @default(uuid())
 
   id_event String
-  event    Event  @relation(fields: [id_event], references: [id])
+  event    Event  @relation(fields: [id_event], references: [id], onDelete: Cascade)
 
   id_participant String
-  participant    Participant @relation(fields: [id_participant], references: [id])
+  participant    Participant @relation(fields: [id_participant], references: [id], onDelete: Cascade)
 
   id_list String
-  list    ListGift @relation(fields: [id_list], references: [id])
+  list    ListGift @relation(fields: [id_list], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

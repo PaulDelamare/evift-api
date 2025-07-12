@@ -1,143 +1,93 @@
-// ! IMPORTS
-import { Elysia, t } from "elysia";
-import { AuthController } from "../controllers/auth.controller";
+import { Elysia } from "elysia";
 import { userModel } from "../models/User";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { ACCESS_TOKEN_EXP } from "../config/auth-config";
 import { getExpTimestamp } from "../lib/utils/getExpTimestamp";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
+import { AuthServices } from "../services/auth/auth.services";
+import { handleError } from "../lib/utils/errorHandler/errorHandler";
+import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
 
-// Create Authentication Route
 export const auth = new Elysia({ prefix: "/auth" })
-  // ! CONFIGURATION
-  // Import model for user
-  .use(userModel)
-  // Declare controller Class
-  .decorate('authController', new AuthController())
 
-  // ! Error Handler
-  .onError(({ code, error }) => {
-    // If Error is an instance of ValidationError
-    if (code === 'VALIDATION')
-      // Throw Error
-      return {  status: error.status, error: error };
-  })
+     .use(userModel)
 
-  // ? Use jwtConfig
-  .use(jwtConfig)
+     .decorate('authServices', new AuthServices())
 
-  // ! ROUTES
-  //? Create login route
-  .post(
-    // Accessible with /login path
-    "/login",
+     .use(jwtConfig)
 
-    // Function
-    async ({ authController, body, jwt, cookie: { accessToken }, set }) => {
+     .post(
+          "/login",
 
-      // Controller Method
-      const response = await authController.login(body);
+          async (ctx) => {
 
-      // Set status with status Reponse
-      set.status = response.status;
+               try {
+                    const user = await ctx.authServices.login(ctx.body);
 
-      // If Error in response
-      if ('error' in response) {
-        // Throw Error
-        return response;
-        // throw new Error(response.error);
-      }
+                    const accessJWTToken = await ctx.jwt.sign({
+                         sub: user.id,
+                         exp: getExpTimestamp(ACCESS_TOKEN_EXP),
+                    });
 
-      // Get user from response
-      const user = response.data;
+                    ctx.cookie.accessToken.set({
+                         value: accessJWTToken,
+                         httpOnly: true,
+                         maxAge: ACCESS_TOKEN_EXP,
+                         path: "/",
+                    });
 
-      // create access token
-      const accessJWTToken = await jwt.sign({
-        // Use user.id
-        sub: user.id,
-        // Set exp time
-        exp: getExpTimestamp(ACCESS_TOKEN_EXP),
-      });
+                    return sendResponse(ctx, 200, { user, accessToken: accessJWTToken });
 
-      // set access token cookie
-      accessToken.set({
-        // Use accessJWTToken
-        value: accessJWTToken,
-        // Declare cookie options
-        httpOnly: true,
-        // Set exp time
-        maxAge: ACCESS_TOKEN_EXP,
-        // Accesible for all routes
-        path: "/",
-      });
+               } catch (err) {
+                    const { status, error: errorResponse } = handleError(err);
 
-      // Return response
-      return {
-        // Success message
-        message: "Connexion réussie",
-        // Return data
-        data: {
-          // Return user
-          user: user,
-          // Return access token
-          accessToken: accessJWTToken,
-          status: 200
-        },
-      };
-    },
-    {
-      // Use Login verification
-      body: 'login',
-      // Detail for swagger
-      detail: {
-        tags: ['Auth'],
-        summary: 'For login register'
-      }
-    }
-  )
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               body: 'login',
+               detail: {
+                    tags: ['Auth'],
+                    summary: 'Request to log in a user',
+               }
+          }
+     )
 
-  //? Create register route
-  .post(
-    // Accessible with /register path
-    "/register",
-    // CONTROLLER
-    async ({ authController, body, set }) => {
+     .post(
+          "/register",
+          async (ctx) => {
+               try {
+                    await ctx.authServices.register(ctx.body);
 
-      // get Response from register method
-      const response = await authController.register(body);
+                    return sendResponse(ctx, 201, "Utilisateur créé avec succès");
 
-      // Set status with status Reponse
-      set.status = response.status;
+               } catch (err) {
+                    console.error(err);
 
-      // Return response
-      return response;
-    },
+                    const { status, error: errorResponse } = handleError(err);
 
-    // HANDLER
-    {
-      //- Validation Based on model
-      body: 'user',
-      //- Detail for swagger
-      detail: {
-        tags: ['Auth'],
-        summary: 'For login user'
-      }
-    })
-  // .use(authPlugin)
+                    throw ctx.error(status, errorResponse);
+               }
+          },
 
-  // ? Use Plugin for check if user is logged 
-  .use(authPlugin)
+          {
+               body: 'user',
+               detail: {
+                    tags: ['Auth'],
+                    summary: 'Request to register a user',
+               }
+          })
 
-  // ? Get current user
-  .get('/me', ({ user }) => {
+     // ? Use Plugin for check if user is logged 
+     .use(authPlugin)
 
+     .get('/me', ({ user }) => {
 
-    // Return user
-    return user
-  },
-    {
-      detail: {
-        tags: ['Auth'],
-        summary: 'Get current user information if is logged'
-      }
-    })
+          return user
+     },
+          {
+               detail: {
+                    tags: ['Auth'],
+                    summary: 'Request to get the connected user\'s information',
+               }
+          })

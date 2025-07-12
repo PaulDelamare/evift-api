@@ -11,21 +11,35 @@ const prisma = new PrismaClient();
 async function main() {
 
     try {
-        await prisma.roleEvent.createMany({
-            data: [
-                {
-                    name: "admin",
-                },
-                {
-                    name: "participant",
-                },
-                {
-                    name: "gift",
-                },
-            ],
-        })
+        const rolesToCreate = [
+            { name: "admin" },
+            { name: "participant" },
+            { name: "gift" },
+            { name: "superAdmin" }
+        ];
 
-        const roles = await prisma.roleEvent.findMany();
+        const existingRoles = await prisma.roleEvent.findMany({
+            where: {
+                name: {
+                    in: rolesToCreate.map(role => role.name)
+                }
+            },
+            select: { name: true }
+        });
+
+        const existingRoleNames = new Set(existingRoles.map(role => role.name));
+
+        const newRoles = rolesToCreate.filter(role => !existingRoleNames.has(role.name));
+
+        if (newRoles.length > 0) {
+            await prisma.roleEvent.createMany({
+                data: newRoles,
+            });
+            console.info(`Created roles: ${newRoles.map(r => r.name).join(", ")}`);
+        } else {
+            console.info("All roles already exist. No new roles created.");
+        }
+
     } catch (error) {
         throw error
     }
@@ -36,7 +50,7 @@ try {
     await main();
 
 } catch (error) {
-    console.log("Une erreur c'est produit, les rôles sont peut être déjà crées");
+    console.error("Une erreur s'est produite, les rôles sont peut-être déjà créés");
     process.exit(1);
 } finally {
     await prisma.$disconnect();

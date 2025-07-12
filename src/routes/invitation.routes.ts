@@ -1,300 +1,232 @@
-// ! IMPORTS
 import { Elysia, t } from "elysia";
-import { InvitationController } from "../controllers/invitation.controller";
 import { authPlugin } from "../plugins/jwtAuth/authPlugin";
 import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
-import { User } from "../models/User";
+import { InvitationServices } from "../services/invitation/invitation.services";
+import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
+import { handleError } from "../lib/utils/errorHandler/errorHandler";
+import { EventInvitationServices } from "../services/eventInvitation/eventInvitation.services";
 
-// Create Invitaion Route
 export const invite = new Elysia({ prefix: "/invitation" })
-    // ! CONFIGURATION
-    // Declare controller Class
-    .decorate("invitationController", new InvitationController())
 
-    // ! Error Handler
-    .onError(({ code, error }) => {
-        // If Error is an instance of ValidationError
-        if (code === "VALIDATION")
-            // Throw Error
-            return { status: error.status, error: error.message };
-    })
+     .decorate("invitationServices", new InvitationServices())
+     .decorate("eventInvitationServices", new EventInvitationServices())
 
-    // ? Use jwtConfig
-    .use(jwtConfig)
+     .use(jwtConfig)
+     .use(authPlugin)
 
-    // HANDLER
 
-    // ? Use Plugin for check if user is logged
-    .use(authPlugin)
+     .post(
+          "/request",
 
-    // ! ROUTES
+          async (ctx) => {
 
-    // ? Post request friends invitation
-    .post(
-        // - Path
-        "/request",
+               try {
 
-        // - Function
-        async ({ body, set, invitationController, user }) => {
+                    const message = await ctx.invitationServices.invitationUser(ctx.body.id, ctx.user.id);
+                    return sendResponse(ctx, 200, message);
 
-            // Define user as User type
-            const userData = user! as User;
+               } catch (error) {
 
-            // get Response from invitationController
-            const response = await invitationController.invitationUser(
-                body,
-                userData.id
-            );
-
-            // Set status with status Reponse
-            set.status = response.status;
-
-            // Return response
-            return response;
-        },
-
-        // - VALIDATION
-        {
-            // Body must have id with format uuid
-            body: t.Object({
-                id: t.String({
-                    format: "uuid",
-                    error: "L'adresse email est invalide",
-                }),
-            }),
-            detail: {
-                tags: ['Invitation'],
-                summary: 'Send request for add friend to an other user'
-            }
-        }
-    )
-
-    // ? Find all Friends Request for our account
-    .get(
-        // - Path
-        "/findAll",
-
-        // - Function
-        async ({ body, set, invitationController, user }) => {
-
-            // Define user as User type
-            const userData = user! as User;
-
-            // get Response from invitationController
-            const response = await invitationController.findInvitations(
-                userData.id
-            );
-
-            // Set status with status Reponse
-            set.status = response.status;
-
-            // Return response
-            return response;
-        },
-
-        // - VALIDATION
-        {
-            detail: {
-                tags: ['Invitation'],
-                summary: 'Find all Friends Request for our account'
-            }
-        }
-    )
-
-    // ? Valide or refuse the Friends request
-
-    .post(
-        // - Path
-        "/accept",
-
-        // - Function
-        async ({ body, set, invitationController, user }) => {
-
-            // Define user as User type
-            const userData = user! as User;
-
-            // get Response from invitationController
-            // For add friend or just delete request
-            const response = await invitationController.acceptInvitation(
-                body.id,
-                userData.id,
-                body.response
-            );
-
-            // Set status with status Reponse
-            set.status = response.status;
-
-            // Return response
-            return response;
-        },
-        {
-            // Define body condition
-            body: t.Object({
-                // Id must be and uuid
-                id: t.String({
-                    format: "uuid",
-                    error: "L'id est invalide",
-                }),
-                // Response must me an boolean (tru for accept or false for refuse)
-                response: t.Boolean({
-                    error: "La réponse doit est true ou false",
-                }),
-            }),
-            // Add this to invitation swagger
-            detail: {
-                tags: ['Invitation'],
-                summary: 'Send response for add friend or just delete request'
-            }
-        }
-    )
-
-    // ? Send request for participation in an event
-    .post(
-        // - Path
-        "/requestEvent",
-
-        // - Function
-        async ({ body, set, invitationController, user }) => {
-
-            // Define user as User type
-            const userData = user! as User;
-
-            // get Response from invitationController
-            const response = await invitationController.eventInvitation(
-                body.invitationId,
-                userData.id,
-                body.eventId
-            );
-
-            // Set status with status Reponse
-            set.status = response.status;
-
-            // Return response
-            return response;
-        },
-        {
-
-            // Body must have id with format uuid
-            body: t.Object({
-                invitationId: t.Array(
-                    t.String({
-                        format: "uuid",
-                        error: "Les ids des utilisateurs sont invalides",
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               body: t.Object({
+                    id: t.String({
+                         format: "uuid",
+                         error: "L'adresse email est invalide",
                     }),
-                ),
-                eventId: t.String({
-                    format: "uuid",
-                    error: "L'id de l'evènement est invalide",
-                }),
-            }),
-            detail: {
-                tags: ['Invitation'],
-                summary: 'Send request for participation in an event'
-            }
-        }
-    )
+               }),
+               detail: {
+                    tags: ['Invitation'],
+                    summary: 'Send request for add friend to an other user or validate a reverse request',
+               }
+          }
+     )
 
-    .get(
-        // - Path
-        "/eventInvitation",
+     .get(
+          "/findAll",
 
-        // - Function
-        async ({ set, invitationController, user }) => {
+          async (ctx) => {
+               try {
 
-            // Define user as User type
-            const userData = user! as User;
+                    const invitation = await ctx.invitationServices.findInvitations(ctx.user.id);
+                    return sendResponse(ctx, 200, invitation);
 
-            // get Response from invitationController
-            const response = await invitationController.getEventInvitations(
-                userData.id
-            );
+               } catch (error) {
 
-            // Set status with status Reponse
-            set.status = response.status;
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               detail: {
+                    tags: ['Invitation'],
+                    summary: 'Find all Friends Request for our account'
+               }
+          }
+     )
 
-            // Return response
-            return response;
-        },
-        {
+     .post(
+          "/accept",
 
-            // Body must have id with format uuid
-            detail: {
-                tags: ['Invitation'],
-                summary: 'Get all request for participation in an event'
-            }
-        }
-    )
+          async (ctx) => {
+               try {
+                    const invitation = await ctx.invitationServices.acceptInvitation(
+                         ctx.body.id,
+                         ctx.user.id,
+                         ctx.body.response
+                    );
+                    return sendResponse(ctx, 200, invitation);
 
-    // ? Give response for participation in an event
-    .post(
-        // - Path
-        "/responseEventInvitation",
+               } catch (error) {
 
-        // - Function
-        async ({ body, set, invitationController, user }) => {
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               body: t.Object({
+                    id: t.String({
+                         format: "uuid",
+                         error: "L'id est invalide",
+                    }),
+                    response: t.Boolean({
+                         error: "La réponse doit est true ou false",
+                    }),
+               }),
+               detail: {
+                    tags: ['Invitation'],
+                    summary: 'Send response for add friend or just delete request'
+               }
+          }
+     )
 
-            // Define user as User type
-            const userData = user! as User;
+     // ? Send request for participation in an event
+     .post(
+          "/requestEvent",
 
-            // get Response from invitationController
-            const response = await invitationController.responseEventInvitation(
-                userData.id,
-                body.invitationId,
-                body.response
-            );
+          async (ctx) => {
+               try {
 
-            // Set status with status Reponse
-            set.status = response.status;
+                    await ctx.eventInvitationServices.eventInvitation(
+                         ctx.body.invitationId,
+                         ctx.user.id,
+                         ctx.body.eventId
+                    );
+                    return sendResponse(ctx, 200, "Invitation(s) envoyée(s) avec succès !");
 
-            // Return response
-            return response;
-        },
-        {
-            // Body must have id event in uuid format and response in boolean
-            body: t.Object({
-                invitationId: t.String({
-                    format: "uuid",
-                    error: "L'id de l'evènement est invalide",
-                }),
-                response: t.Boolean({
-                    error: "La réponse doit est true ou false",
-                }),
-            }),
-            // Add this to invitation swagger
-            detail: {
-                tags: ['Invitation'],
-                summary: 'Give response for participation in an event'
-            }
-        }
-    )
+               } catch (error) {
 
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               body: t.Object({
+                    invitationId: t.Array(
+                         t.String({
+                              format: "uuid",
+                              error: "Les ids des utilisateurs sont invalides",
+                         }),
+                    ),
+                    eventId: t.String({
+                         format: "uuid",
+                         error: "L'id de l'evènement est invalide",
+                    }),
+               }),
+               detail: {
+                    tags: ['Invitation'],
+                    summary: 'Send request for participation in an event'
+               }
+          }
+     )
 
-    // ? Count all Friends Request for our account
-    .get(
-        // - Path
-        "/count",
+     .get(
+          "/eventInvitation",
 
-        // - Function
-        async ({ body, set, invitationController, user }) => {
+          async (ctx) => {
+               try {
 
-            // Define user as User type
-            const userData = user! as User;
+                    const invitations = await ctx.eventInvitationServices.getEventInvitations(
+                         ctx.user.id
+                    );
+                    return sendResponse(ctx, 200, invitations);
 
-            // get Response from invitationController
-            const response = await invitationController.countInvitations(userData.id);
+               } catch (error) {
 
-            // Set status with status Reponse
-            set.status = response.status;
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
 
-            // Return response
-            return response;
-        },
+               detail: {
+                    tags: ['Invitation'],
+                    summary: 'Get all request for participation in an event'
+               }
+          }
+     )
 
-        // - VALIDATION
-        {
-            detail: {
-                tags: ['Invitation'],
-                summary: 'Get count for event and friends invitation'
-            }
-        }
-    )
+     .post(
+          "/responseEventInvitation",
+
+          async (ctx) => {
+               try {
+
+                    const message = await ctx.eventInvitationServices.responseEventInvitation(
+                         ctx.user.id,
+                         ctx.body.id,
+                         ctx.body.response
+                    );
+                    return sendResponse(ctx, 200, message);
+
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          
+          {
+               body: t.Object({
+                    id: t.String({
+                         format: "uuid",
+                         error: "L'id de l'evènement est invalide",
+                    }),
+                    response: t.Boolean({
+                         error: "La réponse doit est true ou false",
+                    }),
+               }),
+               detail: {
+                    tags: ['Invitation'],
+                    summary: 'Give response for participation in an event'
+               }
+          }
+     )
+
+     .get(
+          "/count",
+
+          async (ctx) => {
+               try {
+
+                    const notifications = await ctx.eventInvitationServices.getInvitationNotifications(
+                         ctx.user.id
+                    );
+                    return sendResponse(ctx, 200, notifications);
+
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               detail: {
+                    tags: ['Invitation'],
+                    summary: 'Get count for event and friends invitation'
+               }
+          }
+     )
