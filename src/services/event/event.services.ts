@@ -42,7 +42,7 @@ export class EventServices extends BaseService {
           });
 
 
-          const idAdminRole = await this.roleEventServices.findRoleEvent("admin");
+          const idAdminRole = await this.roleEventServices.findRoleEvent("superAdmin");
 
           await this.participantServices.addNewParticipant(newEvent.id, id_user, idAdminRole!.id);
 
@@ -68,7 +68,6 @@ export class EventServices extends BaseService {
                where: {
                     event: { date: { gt: now }, },
                     id_user
-
                },
                orderBy: { event: { date: 'asc' } },
                include: {
@@ -141,29 +140,33 @@ export class EventServices extends BaseService {
      /**
       * Updates the role of a participant in a specific event.
       *
-      * This method allows an admin to change the role of another participant within an event.
-      * It performs the following checks:
-      * - The requester must be a participant with the "admin" role in the event.
-      * - The target participant must exist in the event.
-      * - The target participant must not already have the "admin" role.
+      * This method checks the permissions of the requester to ensure they have the rights
+      * to modify the role of another participant. Only users with "admin" or "superAdmin"
+      * roles can update participant roles. Additional restrictions apply when modifying
+      * "admin" or "superAdmin" roles.
       *
-      * @param validatedData - An object containing:
-      *   - `id_event`: The ID of the event.
-      *   - `id_user`: The ID of the participant whose role is to be updated.
-      *   - `id_role`: The new role ID to assign to the participant.
-      * @param userId - The ID of the user making the request (requester).
-      * @throws Throws a 403 error if the requester is not an admin or tries to modify an admin.
-      * @throws Throws a 404 error if the target participant is not found.
-      * @returns A promise that resolves when the participant's role is updated.
+      * @param validatedData - An object containing the event ID (`id_event`), the user ID of the participant to update (`id_user`), and the new role ID (`id_role`).
+      * @param userId - The ID of the user making the request.
+      * @throws Throws a 403 error if the requester is not a participant, lacks sufficient rights, or attempts to modify restricted roles.
+      * @throws Throws a 404 error if the target participant is not found for the event.
+      * @returns Resolves when the participant's role is successfully updated.
       */
      public async updateParticipant(validatedData: { id_event: string; id_user: string; id_role: string }, userId: string) {
-          const [requesterParticipant, adminRole, targetParticipant] = await Promise.all([
+          const [requesterParticipant, adminRole, superAdminRole, targetParticipant] = await Promise.all([
                this.participantServices.findOneParticipant(userId, validatedData.id_event),
                this.roleEventServices.findRoleEvent("admin"),
+               this.roleEventServices.findRoleEvent("superAdmin"),
                this.participantServices.findOneParticipant(validatedData.id_user, validatedData.id_event),
           ]);
 
-          if (!requesterParticipant || requesterParticipant.roleRef.id !== adminRole?.id) {
+          if (!requesterParticipant) {
+               throw throwError(403, "Vous n'êtes pas un participant de cet événement");
+          }
+
+          const isRequesterSuperAdmin = requesterParticipant.roleRef.id === superAdminRole?.id;
+          const isRequesterAdmin = requesterParticipant.roleRef.id === adminRole?.id;
+
+          if (!isRequesterAdmin && !isRequesterSuperAdmin) {
                throw throwError(403, "Vous n'avez pas les droits pour modifier le rôle d'un participant");
           }
 
@@ -171,8 +174,12 @@ export class EventServices extends BaseService {
                throw throwError(404, "Participant introuvable pour cet événement");
           }
 
-          if (targetParticipant.roleRef.name === "admin") {
-               throw throwError(403, "Vous ne pouvez pas modifier le rôle d'un administrateur");
+          if (targetParticipant.roleRef.id === superAdminRole?.id) {
+               throw throwError(403, "Le rôle superAdmin ne peut pas être modifié");
+          }
+
+          if (targetParticipant.roleRef.id === adminRole?.id && !isRequesterSuperAdmin) {
+               throw throwError(403, "Seul un superAdmin peut modifier le rôle d'un administrateur");
           }
 
           await this.db.participant.update({
