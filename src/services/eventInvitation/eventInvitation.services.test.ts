@@ -21,7 +21,7 @@ describe('EventInvitationServices', () => {
      });
 
      describe('transformEventInvitationArray', () => {
-          it('🚀 doit transformer un tableau d’IDs en objets', () => {
+          it('should transform an array of IDs into objects', () => {
                const res = service.transformEventInvitationArray(invitations, eventId, organizer);
                expect(res).toEqual([
                     { id_event: eventId, id_user: 'u1', id_organizer: organizer },
@@ -29,17 +29,17 @@ describe('EventInvitationServices', () => {
                ]);
           });
 
-          it('🚀 doit renvoyer vide si pas d’IDs', () => {
+          it('should return empty if no IDs', () => {
                expect(service.transformEventInvitationArray([], eventId, organizer)).toEqual([]);
           });
      });
 
      describe('checkUserAlreadyInvited', () => {
-          it('🚀 ne rien faire si liste vide', async () => {
+          it('should do nothing if the list is empty', async () => {
                expect(service.checkUserAlreadyInvited([], eventId)).resolves.toBeUndefined();
           });
 
-          it('🚀 lever si count > 0', async () => {
+          it('should throw if count > 0', async () => {
                dbStub.eventInvitation.count = async () => 3;
                expect(service.checkUserAlreadyInvited(invitations, eventId))
                     .rejects.toMatchObject({
@@ -50,14 +50,14 @@ describe('EventInvitationServices', () => {
                     });
           });
 
-          it('🚀 résoudre si count = 0', async () => {
+          it('should resolve if count = 0', async () => {
                dbStub.eventInvitation.count = async () => 0;
                expect(service.checkUserAlreadyInvited(invitations, eventId)).resolves.toBeUndefined();
           });
      });
 
      describe('createManyEventInvitation', () => {
-          it('🚀 doit appeler createMany avec les données correctes', async () => {
+          it('should call createMany with the correct data', async () => {
                let received: any = null;
                dbStub.eventInvitation.createMany = async ({ data }: any) => { received = data; };
                const data = service.transformEventInvitationArray(invitations, eventId, organizer);
@@ -67,7 +67,7 @@ describe('EventInvitationServices', () => {
      });
 
      describe('eventInvitation', () => {
-          it('🚀 lever 403 si l’organisateur n’est pas admin', async () => {
+          it('should throw 403 if organizer is not admin', async () => {
                // @ts-ignore
                (service.participantServices as any).findParticipantByUserIdAndEventId = async () => ({ roleRef: { name: 'member' } });
                expect(service.eventInvitation(invitations, organizer, eventId))
@@ -79,7 +79,7 @@ describe('EventInvitationServices', () => {
                     });
           });
 
-          it('🚀 lever 400 si un invité est déjà participant', async () => {
+          it(' lever 400 si un invité est déjà participant', async () => {
                // @ts-ignore
                (service.participantServices as any).findParticipantByUserIdAndEventId = async (u: string) =>
                     u === organizer
@@ -98,7 +98,7 @@ describe('EventInvitationServices', () => {
                     });
           });
 
-          it('🚀 lever 400 si un invité n’est pas ami', async () => {
+          it('should throw 400 if an invited user is not a friend', async () => {
                // @ts-ignore
                (service.participantServices as any).findParticipantByUserIdAndEventId = async (u: string) =>
                     u === organizer
@@ -117,7 +117,7 @@ describe('EventInvitationServices', () => {
                     });
           });
 
-          it('🚀 lever si déjà invité', async () => {
+          it('should throw if already invited', async () => {
                // @ts-ignore
                (service.participantServices as any).findParticipantByUserIdAndEventId = async (u: string) =>
                     u === organizer
@@ -135,7 +135,7 @@ describe('EventInvitationServices', () => {
                     });
           });
 
-          it('🚀 créer les invitations quand tout est OK', async () => {
+          it('creates invitations when everything is OK', async () => {
                // @ts-ignore
                (service.participantServices as any).findParticipantByUserIdAndEventId = async (u: string) =>
                     u === organizer
@@ -168,7 +168,7 @@ describe('EventInvitationServices', () => {
                service = new EventInvitationServices(dbStub);
           });
 
-          it('🚀 devrait retourner un tableau d’invitations avec organizer et event inclus', async () => {
+          it('should return an array of invitations with organizer and event included', async () => {
                const now = new Date();
                const mockInvitations = [
                     {
@@ -241,7 +241,7 @@ describe('EventInvitationServices', () => {
                expect(result).toEqual(mockInvitations);
           });
 
-          it('🚀 devrait retourner un tableau vide si aucune invitation trouvée', async () => {
+          it('should return an empty array if no invitations are found', async () => {
                dbStub.eventInvitation.findMany = async () => [];
                const result = await service.getEventInvitations('noUser');
                expect(result).toEqual([]);
@@ -270,7 +270,7 @@ describe('EventInvitationServices', () => {
                service = new EventInvitationServices(dbStub);
           });
 
-          it('🚀 devrait retourner l’invitation si elle existe', async () => {
+          it('should return the invitation if it exists', async () => {
                dbStub.eventInvitation.findFirst = async (args: any) => {
                     expect(args.where).toEqual({ id_user: 'user1', id_event: 'evt1' });
                     return mockInvitation;
@@ -280,7 +280,7 @@ describe('EventInvitationServices', () => {
                expect(result).toEqual(mockInvitation);
           });
 
-          it('🚀 devrait lever une erreur 404 si non trouvée et checkError=true', async () => {
+          it('should throw a 404 error if not found and checkError=true', async () => {
                dbStub.eventInvitation.findFirst = async () => null;
                expect(
                     service.findEventInvitationByUserIdAndEventId('userX', 'evtX')
@@ -292,7 +292,7 @@ describe('EventInvitationServices', () => {
                });
           });
 
-          it('🚀 devrait retourner null si non trouvée et checkError=false', async () => {
+          it('should return null if not found and checkError=false', async () => {
                dbStub.eventInvitation.findFirst = async () => null;
                const result = await service.findEventInvitationByUserIdAndEventId('userX', 'evtX', false);
                expect(result).toBeNull();
@@ -311,15 +311,15 @@ describe('EventInvitationServices', () => {
                service = new EventInvitationServices(dbStub);
           });
 
-          it('🚀 devrait lever une erreur si l’invitation est introuvable', async () => {
+          it('should throw an error if the invitation is not found', async () => {
                // @ts-ignore
                (service as any).findEventInvitationByUserIdAndEventId = async () => null;
 
-               await expect(service.responseEventInvitation(userId, eventId, true))
+               expect(service.responseEventInvitation(userId, eventId, true))
                     .rejects.toThrow();
           });
 
-          it('🚀 devrait lever une erreur si l’événement est introuvable', async () => {
+          it('should throw an error if the event is not found', async () => {
                // Stub invitation found
                // @ts-ignore
                (service as any).findEventInvitationByUserIdAndEventId = async () => invitation;
@@ -335,26 +335,21 @@ describe('EventInvitationServices', () => {
                     });
           });
 
-          it('🚀 devrait accepter l’invitation (response=true)', async () => {
+          it('should accept the invitation (response=true)', async () => {
                let added = false;
                let deletedId: string | null = null;
 
-               // Stub invitation found
                // @ts-ignore
                (service as any).findEventInvitationByUserIdAndEventId = async () => invitation;
-               // Stub event exists
                service.eventServices.findEventById = async () => ({ id: eventId } as any);
-               // Stub role retrieval
                service.roleEventServices.findRoleEvent = async (name: string) => ({
                     id: 'role-participant',
                     name,
                     createdAt: new Date(),
                });
-               // Stub addNewParticipant
                service.participantServices.addNewParticipant = async (_e: string, _u: string, _r: string) => {
                     added = true;
                };
-               // Stub deleteEventInvitation
                // @ts-ignore
                (service as any).deleteEventInvitation = async (id: string) => {
                     deletedId = id;
@@ -363,12 +358,12 @@ describe('EventInvitationServices', () => {
                const result = await service.responseEventInvitation(userId, eventId, true);
                expect(result).toBe('Invitation acceptée');
                expect(added).toBe(true);
-               // @ts-ignore
 
+               // @ts-ignore
                expect(deletedId).toBe(invitation.id);
           });
 
-          it('🚀 devrait refuser l’invitation (response=false)', async () => {
+          it('should refuse the invitation (response=false)', async () => {
                let added = false;
                let deletedId: string | null = null;
                let roleCalled = false;
@@ -425,7 +420,7 @@ describe('EventInvitationServices', () => {
                (service as any).invitationServices = mockInvitationServices;
           });
 
-          it("🚀 retourne le bon nombre de notifications pour un utilisateur donné", async () => {
+          it("should return the correct number of notifications for a given user", async () => {
                const result = await service.getInvitationNotifications("user-1");
 
                expect(result).toEqual({
@@ -434,7 +429,7 @@ describe('EventInvitationServices', () => {
                });
           });
 
-          it("🚀 retourne 0 pour chaque type de notification si aucun résultat", async () => {
+          it("should return 0 for each type of notification if no results", async () => {
                const result = await service.getInvitationNotifications("user-999");
 
                expect(result).toEqual({
