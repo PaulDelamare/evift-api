@@ -62,13 +62,13 @@ describe('InvitationServices', () => {
      });
 
      describe('checkInvitation', () => {
-          it('🚀 devrait retourner null si aucune invitation existante', async () => {
+          it('should return null if no invitation exists', async () => {
                dbStub.invitation.findFirst = async () => null;
                const result = await (service as any).checkInvitation('req1', 'user1');
                expect(result).toBeNull();
           });
 
-          it('🚀 devrait lever une erreur 400 si invitation existe et checkAlreadyError=true', async () => {
+          it('should throw a 400 error if invitation exists and checkAlreadyError=true', async () => {
                const inv = { id: 'inv1', userId: 'user1', requestId: 'req1' };
                dbStub.invitation.findFirst = async () => inv;
                expect(
@@ -81,7 +81,7 @@ describe('InvitationServices', () => {
                });
           });
 
-          it('🚀 devrait retourner l\'invitation si existe et checkAlreadyError=false', async () => {
+          it('should return the invitation if it exists and checkAlreadyError=false', async () => {
                const inv = { id: 'inv1', userId: 'user1', requestId: 'req1' };
                dbStub.invitation.findFirst = async () => inv;
                const result = await (service as any).checkInvitation('req1', 'user1', false);
@@ -90,20 +90,17 @@ describe('InvitationServices', () => {
      });
 
      describe('confirmInvitation', () => {
-          it('🚀 devrait appeler addFriends puis deleteInvitation', async () => {
+          it('should call addFriends then deleteInvitation', async () => {
                let added = false;
                let deletedId: string | null = null;
 
-               // Stub friendsServices.addFriends
                service.friendsServices.addFriends = async (_a: string, _b: string) => {
                     added = true;
                };
-               // Stub delete sur la DB pour capturer l'ID
                dbStub.invitation.delete = async ({ where }: any) => {
                     deletedId = where.id;
                };
 
-               // **Cast service en any pour bypasser le typage privé**
                await (service as any).confirmInvitation('userA', 'userB', 'invX');
 
                expect(added).toBe(true);
@@ -115,7 +112,7 @@ describe('InvitationServices', () => {
 
 
      describe('deleteInvitation', () => {
-          it('🚀 devrait appeler db.invitation.delete avec le bon ID', async () => {
+          it('should call db.invitation.delete with the correct ID', async () => {
                let receivedWhere: any = null;
                dbStub.invitation.delete = async (args: any) => {
                     receivedWhere = args.where;
@@ -128,7 +125,7 @@ describe('InvitationServices', () => {
      });
 
      describe('createInvitation', () => {
-          it('🚀 devrait appeler db.invitation.create avec les bons paramètres', async () => {
+          it('should call db.invitation.create with the correct parameters', async () => {
                let receivedData: any = null;
                dbStub.invitation.create = async ({ data }: any) => {
                     receivedData = data;
@@ -144,7 +141,7 @@ describe('InvitationServices', () => {
           const target = 'target';
           const sender = 'sender';
 
-          it('🚀 devrait lever si on s\'invite soi-même', async () => {
+          it('should throw if a user invites themselves', async () => {
                expect(service.invitationUser(sender, sender))
                     .rejects.toMatchObject({
                          status: 400,
@@ -154,7 +151,7 @@ describe('InvitationServices', () => {
                     });
           });
 
-          it('🚀 devrait propager l\'erreur si l\'utilisateur cible n\'existe pas', async () => {
+          it('should propagate the error if the target user does not exist', async () => {
                service.userServices.findUser = async () => { throw throwError(404, 'Not Found'); };
                expect(service.invitationUser(target, sender)).rejects.toMatchObject({
                     status: 404,
@@ -164,7 +161,7 @@ describe('InvitationServices', () => {
                });
           });
 
-          it('🚀 devrait propager l\'erreur si déjà amis', async () => {
+          it('should propagate the error if already friends', async () => {
                service.userServices.findUser = async () => ({
                     id: target,
                     createdAt: new Date(),
@@ -181,7 +178,7 @@ describe('InvitationServices', () => {
                });
           });
 
-          it('🚀 devrait confirmer l\'invitation si une invitation inverse existe', async () => {
+          it('should confirm the invitation if a reverse invitation exists', async () => {
                service.userServices.findUser = async () => ({
                     id: target,
                     createdAt: new Date(),
@@ -190,7 +187,6 @@ describe('InvitationServices', () => {
                     lastname: 'TargetLast'
                });
                service.friendsServices.checkAlreadyFriends = async () => null;
-               // simuler checkInvitation : première appel null, deuxième retourne invitation inverse
                let calls = 0;
                (service as any).checkInvitation = async (id: string, uid: string, chk: boolean) => {
                     calls++;
@@ -206,7 +202,7 @@ describe('InvitationServices', () => {
                expect(deleted).toBe(true);
           });
 
-          it('🚀 devrait envoyer une nouvelle invitation sinon', async () => {
+          it('should send a new invitation otherwise', async () => {
                service.userServices.findUser = async () => ({
                     id: target,
                     email: 'target@example.com',
@@ -238,7 +234,7 @@ describe('InvitationServices', () => {
                service = new InvitationServices(dbStub);
           });
 
-          it('🚀 devrait retourner un tableau d’invitations avec détails utilisateur', async () => {
+          it('should return an array of invitations with user details', async () => {
                const now = new Date();
                const mockInvitations = [
                     {
@@ -267,7 +263,6 @@ describe('InvitationServices', () => {
                     },
                ];
                dbStub.invitation.findMany = async (args: any) => {
-                    // Vérifier le where et l'include
                     expect(args.where).toEqual({ requestId: 'req1' });
                     expect(args.include).toEqual({
                          user: {
@@ -286,7 +281,7 @@ describe('InvitationServices', () => {
                expect(result).toEqual(mockInvitations);
           });
 
-          it('🚀 devrait retourner un tableau vide si aucune invitation trouvée', async () => {
+          it('should return an empty array if no invitations are found', async () => {
                dbStub.invitation.findMany = async () => [];
                const result = await service.findInvitations('unknownReq');
                expect(result).toEqual([]);
@@ -308,7 +303,7 @@ describe('InvitationServices', () => {
                service = new InvitationServices(dbStub);
           });
 
-          it('🚀 devrait retourner l’invitation si elle est trouvée', async () => {
+          it('should return the invitation if found', async () => {
                dbStub.invitation.findFirst = async (args: any) => {
                     expect(args.where).toEqual({ id: 'inv1' });
                     return mockInv;
@@ -318,7 +313,7 @@ describe('InvitationServices', () => {
                expect(result).toEqual(mockInv);
           });
 
-          it('🚀 devrait lever une erreur 404 si non trouvée et checkError=true', async () => {
+          it('should throw a 404 error if not found and checkError=true', async () => {
                dbStub.invitation.findFirst = async () => null;
                expect(service.findInvitationById('absent')).rejects.toMatchObject({
                     status: 404,
@@ -328,7 +323,7 @@ describe('InvitationServices', () => {
                });
           });
 
-          it('🚀 devrait retourner null si non trouvée et checkError=false', async () => {
+          it('should return null if not found and checkError=false', async () => {
                dbStub.invitation.findFirst = async () => null;
                const result = await service.findInvitationById('absent', false);
                expect(result).toBeNull();
@@ -350,7 +345,7 @@ describe('InvitationServices', () => {
                service = new InvitationServices(dbStub);
           });
 
-          it('🚀 devrait lever une erreur si l’invitation n’existe pas', async () => {
+          it('should throw an error if the invitation does not exist', async () => {
                service.findInvitationById = async () => null;
                expect(service.acceptInvitation('invX', 'receiver', true))
                     .rejects.toMatchObject({
@@ -361,7 +356,7 @@ describe('InvitationServices', () => {
                     });
           });
 
-          it('🚀 devrait lever une erreur si requestId ne correspond pas à userId fourni', async () => {
+          it('should throw an error if requestId does not match the provided userId', async () => {
                service.findInvitationById = async () => ({ ...mockInvitation, requestId: 'other' });
                expect(service.acceptInvitation('inv1', 'receiver', true))
                     .rejects.toMatchObject({
@@ -372,7 +367,7 @@ describe('InvitationServices', () => {
                     });
           });
 
-          it('🚀 devrait appeler checkAlreadyFriends puis addFriends et deleteInvitation quand accept=true', async () => {
+          it('should call checkAlreadyFriends then addFriends and deleteInvitation when accept=true', async () => {
                let checked = false;
                let added = false;
                let deleted = false;
@@ -389,7 +384,7 @@ describe('InvitationServices', () => {
                expect(deleted).toBe(true);
           });
 
-          it('🚀 devrait appeler checkAlreadyFriends et deleteInvitation seulement quand accept=false', async () => {
+          it('should call checkAlreadyFriends and deleteInvitation only when accept=false', async () => {
                let checked = false;
                let added = false;
                let deleted = false;
@@ -421,7 +416,7 @@ describe('InvitationServices', () => {
           });
 
           describe('countNotification', () => {
-               it('🚀 doit retourner le nombre de notifications pour un utilisateur', async () => {
+               it('should return the number of notifications for a user', async () => {
                     const userId = 'user-123';
                     let calledWith: any = null;
                     mockDb.invitation.count = async (args: any) => {
@@ -437,7 +432,7 @@ describe('InvitationServices', () => {
                     expect(result).toBe(4);
                });
 
-               it('🚀 doit retourner 0 si aucune notification n\'existe', async () => {
+               it('should return 0 if no notifications exist', async () => {
                     const userId = 'user-999';
                     let calledWith: any = null;
                     mockDb.invitation.count = async (args: any) => {
