@@ -10,7 +10,6 @@ describe('ListEventServices.checkIfListInEvent', () => {
           const dbStub = {
                listEvent: {
                     findFirst: async (args: any) => {
-                         // Vérifier que la requête est bien construite
                          expect(args).toEqual({
                               where: {
                                    id_participant: participantId,
@@ -31,7 +30,6 @@ describe('ListEventServices.checkIfListInEvent', () => {
           const dbStub = {
                listEvent: {
                     findFirst: async (args: any) => {
-                         // Vérifier que la requête est bien construite
                          expect(args).toEqual({
                               where: {
                                    id_participant: participantId,
@@ -424,7 +422,6 @@ describe('ListEventServices.findListByListIdAndEventId', () => {
      };
 
      beforeEach(() => {
-          // Création d'une fonction mock pour findFirst
           const findFirstMock = (args: any) => {
                findFirstMock.lastCall = args;
                return findFirstMock.returnValue;
@@ -441,12 +438,10 @@ describe('ListEventServices.findListByListIdAndEventId', () => {
      });
 
      it('should return list-event association when found', async () => {
-          // Configure le mock pour retourner les données simulées
           mockPrisma.listEvent.findFirst.returnValue = mockListEvent;
 
           const result = await service.findListByListIdAndEventId(listId, eventId);
 
-          // Vérifie que la méthode prisma a été appelée avec les bons paramètres
           expect(mockPrisma.listEvent.findFirst.lastCall).toEqual({
                where: {
                     id_list: listId,
@@ -454,15 +449,12 @@ describe('ListEventServices.findListByListIdAndEventId', () => {
                }
           });
 
-          // Vérifie que le résultat correspond aux données simulées
           expect(result).toEqual(mockListEvent);
      });
 
      it('should throw 404 error when list-event not found and requireList is true', async () => {
-          // Configure le mock pour renvoyer null (association non trouvée)
           mockPrisma.listEvent.findFirst.returnValue = null;
 
-          // Teste que l'appel génère l'erreur attendue avec requireList=true (valeur par défaut)
           expect(service.findListByListIdAndEventId(listId, eventId))
                .rejects.toMatchObject({
                     status: 404,
@@ -471,10 +463,8 @@ describe('ListEventServices.findListByListIdAndEventId', () => {
      });
 
      it('should return null when list-event not found and requireList is false', async () => {
-          // Configure le mock pour renvoyer null (association non trouvée)
           mockPrisma.listEvent.findFirst.returnValue = null;
 
-          // Teste que l'appel renvoie null quand requireList=false
           const result = await service.findListByListIdAndEventId(listId, eventId, false);
           expect(result).toBeNull();
      });
