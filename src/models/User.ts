@@ -1,4 +1,3 @@
-// auth.model.ts
 import { Elysia, t } from 'elysia'
 
 export interface User {
@@ -19,14 +18,14 @@ export const userModel = new Elysia()
             email: t.String({ format: 'email', error: 'L\'adresse email est invalide' }),
             password: t.String({
                 error: 'Le mot de passe est invalide, il doit comporter au moins 8 caractères, dont une majuscule, un chiffre et un caractère spécial (@$!%*?&)',
-                pattern: '^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,30}$'
+                pattern: '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,30}$'
             })
         }),
         login: t.Object({
             email: t.String({ format: "email", error: { message: "L'adresse email est invalide" } }),
             password: t.String({
                 error: 'Le mot de passe est invalide, il doit comporter au moins 8 caractères, dont une majuscule, un chiffre et un caractère spécial (@$!%*?&)',
-                pattern: '^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,30}$'
+                pattern: '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,30}$'
 
             })
         })
