@@ -39,7 +39,6 @@ describe('RoleServices.create', () => {
      it('should call db.roleEvent.create with the correct data', async () => {
           let receivedArgs: any = null;
 
-          // Stub minimaliste pour capturer l'appel
           const dbStub = {
                roleEvent: {
                     create: async (args: any) => {
@@ -52,7 +51,6 @@ describe('RoleServices.create', () => {
           const service = new RoleEventServices(dbStub as any);
           await service.create('MyRole');
 
-          // On vérifie que create a bien été appelé avec le bon payload
           expect(receivedArgs).toEqual({
                data: {
                     name: 'MyRole',
@@ -61,7 +59,6 @@ describe('RoleServices.create', () => {
      });
 
      it('should propagate errors from db.roleEvent.create', async () => {
-          // On fait échouer la création
           const dbStub = {
                roleEvent: {
                     create: async () => {
@@ -72,7 +69,7 @@ describe('RoleServices.create', () => {
 
           const service = new RoleEventServices(dbStub as any);
 
-          await expect(service.create('RoleX')).rejects.toThrow('DB Error');
+          expect(service.create('RoleX')).rejects.toThrow('DB Error');
      });
 });
 
@@ -107,7 +104,7 @@ describe('RoleServices.findAll', () => {
 
           const service = new RoleEventServices(dbStub as any);
 
-          await expect(service.findAll()).rejects.toThrow('DB Failure');
+          expect(service.findAll()).rejects.toThrow('DB Failure');
      });
 });
 
