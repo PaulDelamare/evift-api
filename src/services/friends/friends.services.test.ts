@@ -197,7 +197,7 @@ describe('FriendsServices.addFriends', () => {
           service = new FriendsServices(dbStub);
      });
 
-     it('🚀 devrait appeler db.friends.create avec user1Id et user2Id corrects', async () => {
+     it('should call db.friends.create with correct user1Id and user2Id', async () => {
           let receivedData: any = null;
           dbStub.friends.create = async ({ data }: any) => {
                receivedData = data;
@@ -212,8 +212,7 @@ describe('FriendsServices.addFriends', () => {
           });
      });
 
-     it('🚀 devrait résoudre la promesse sans renvoyer de valeur', async () => {
-          // Par défaut, create renvoie null, donc addFriends doit simplement résoudre
+     it('should resolve the promise without returning a value', async () => {
           expect(service.addFriends('userX', 'userY')).resolves.toBeUndefined();
      });
 });
