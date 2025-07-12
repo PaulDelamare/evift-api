@@ -99,7 +99,7 @@ export class AuthServices extends BaseService {
           const alreadyUser = await this.checkUserExists(body.email);
 
           if (alreadyUser) {
-               return { status: 400, error: "Cet email est déjà utilisé !" };
+               throw throwError(400, "Cet email est déjà utilisé !");
           }
 
           const newUser = await this.db.user.create({
