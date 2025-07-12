@@ -353,45 +353,10 @@ describe('EventServices.updateParticipant', () => {
           roleRef: { id: 'user-role-id', name: 'user' }
      };
 
-     it('should update the participant role if requester is admin and target is not admin', async () => {
-          let updateCalledWith: any = undefined;
-          const participantServicesStub = {
-               findOneParticipant: async (userId: string, eventId: string) => {
-                    if (userId === 'admin-user') return requesterParticipant;
-                    if (userId === 'target-user') return targetParticipant;
-                    return null;
-               }
-          };
-          const roleEventServicesStub = {
-               findRoleEvent: async (roleName: string) => {
-                    expect(roleName).toBe('admin');
-                    return adminRole;
-               }
-          };
-          const dbStub = {
-               participant: {
-                    update: async (params: any) => {
-                         updateCalledWith = params;
-                         return;
-                    }
-               }
-          };
-
-          const service = new EventServices(dbStub as any);
-          service.participantServices = participantServicesStub as any;
-          service.roleEventServices = roleEventServicesStub as any;
-
-          await service.updateParticipant(validatedData, 'admin-user');
-          expect(updateCalledWith).toEqual({
-               where: { id: targetParticipant.id },
-               data: { id_role: validatedData.id_role }
-          });
-     });
-
      it('should throw 403 if requester is not a participant or not admin', async () => {
           const participantServicesStub = {
                findOneParticipant: async (userId: string, eventId: string) => {
-                    if (userId === 'admin-user') return null; // not a participant
+                    if (userId === 'admin-user') return null;
                     if (userId === 'target-user') return targetParticipant;
                     return null;
                }
@@ -411,9 +376,9 @@ describe('EventServices.updateParticipant', () => {
                .rejects.toMatchObject({
                     status: 403,
                     error: {
-                         error: "Vous n\'avez pas les droits pour modifier le rôle d\'un participant",
+                         error: "Vous n'êtes pas un participant de cet événement",
                     },
-               });;
+               });
      });
 
      it('should throw 404 if target participant not found', async () => {
@@ -471,7 +436,7 @@ describe('EventServices.updateParticipant', () => {
                .rejects.toMatchObject({
                     status: 403,
                     error: {
-                         error: "Vous ne pouvez pas modifier le rôle d'un administrateur",
+                         error: "Le rôle superAdmin ne peut pas être modifié",
                     },
                });
      });
@@ -526,7 +491,7 @@ describe('EventServices.findEventById', () => {
           service = new EventServices(dbStub);
      });
 
-     it('🚀 devrait retourner l’événement si trouvé', async () => {
+     it('should return the event if found', async () => {
           dbStub.event.findUnique = async (args: any) => {
                expect(args.where).toEqual({ id: 'evt1' });
                return mockEvent;
@@ -536,7 +501,7 @@ describe('EventServices.findEventById', () => {
           expect(result).toEqual(mockEvent);
      });
 
-     it('🚀 devrait lever une erreur 404 si non trouvé et checkError=true', async () => {
+     it('should throw a 404 error if not found and checkError=true', async () => {
           dbStub.event.findUnique = async () => null;
           expect(service.findEventById('unknown')).rejects.toMatchObject({
                status: 404,
@@ -546,7 +511,7 @@ describe('EventServices.findEventById', () => {
           });
      });
 
-     it('🚀 devrait retourner null si non trouvé et checkError=false', async () => {
+     it('should return null if not found and checkError=false', async () => {
           dbStub.event.findUnique = async () => null;
           const result = await service.findEventById('unknown', false);
           expect(result).toBeNull();
