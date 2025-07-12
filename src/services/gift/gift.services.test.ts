@@ -225,13 +225,11 @@ describe('GiftServices.addListEvent', () => {
      const listId = 'list-1';
 
      beforeEach(() => {
-          // Instanciation de ton service sans db réel
           service = new GiftServices({} as any);
           participantServices = new FakeParticipantServices();
           listGiftServices = new FakeListGiftServices();
           listEventServices = new FakeListEventServices();
 
-          // Injection manuelle
           (service as any).participantServices = participantServices;
           (service as any).listGiftServices = listGiftServices;
           (service as any).listEventServices = listEventServices;
@@ -340,7 +338,7 @@ describe('GiftServices.findListEvent', () => {
      });
 
      it('should return list events on success', async () => {
-          // Remplacer le comportement par défaut pour renvoyer un participant valide
+
           (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
                id: 'participant-1',
                roleRef: { name: 'admin' }
@@ -456,9 +454,9 @@ describe('GiftServices.removeListEvent', () => {
      });
 
      it('should propagate error from findOneListByParticipantAndList', async () => {
-          // Stub participant
+
           (participantServices.findParticipantByUserIdAndEventId as any) = async () => participant;
-          // findOneListByParticipantAndList rejette
+
           (listEventServices.findOneListByParticipantAndList as any) = async () => {
                throw throwError(404, 'Liste de cadeaux introuvable');
           };
@@ -471,9 +469,7 @@ describe('GiftServices.removeListEvent', () => {
      });
 
      it('should call removeListEvent when participant and entry exist', async () => {
-          // Stub participant
           (participantServices.findParticipantByUserIdAndEventId as any) = async () => participant;
-          // Stub findOneList...
           const fakeEntry = { id: 'le-1', id_participant: participant.id, id_list: listId };
           (listEventServices.findOneListByParticipantAndList as any) = async () => fakeEntry;
 
@@ -487,10 +483,8 @@ describe('GiftServices.removeListEvent', () => {
      });
 
      it('should propagate error from removeListEvent', async () => {
-          // Stub participant and findOneList...
           (participantServices.findParticipantByUserIdAndEventId as any) = async () => participant;
           (listEventServices.findOneListByParticipantAndList as any) = async () => ({ id: 'le-2' });
-          // removeListEvent rejette
           (listEventServices.removeListEvent as any) = async () => {
                throw new Error('Delete failed');
           };
@@ -530,7 +524,6 @@ describe('GiftServices.findList', () => {
                          url: 'http://example.com/book',
                          createdAt: new Date(),
                          updatedAt: new Date(),
-                         // Propriétés manquantes:
                          id_list: 'original-list-1',
                          id_user: 'user-123',
                          taken: false,
@@ -538,11 +531,9 @@ describe('GiftServices.findList', () => {
                          quantity: 1
                     }
                ],
-               // Propriété user manquante:
                user: {
                     firstname: 'Jean',
                     lastname: 'Dupont',
-                    // Autres propriétés requises du user
                }
           }
      };
@@ -556,7 +547,6 @@ describe('GiftServices.findList', () => {
      });
 
      it('should return list when user has permission', async () => {
-          // Configurer les mocks pour le succès
           (listEventServices.findListById as any) = async () => mockListEvent;
           (participantServices.findParticipantByUserIdAndEventId as any) = async () => ({
                id: 'participant-1',
@@ -569,15 +559,13 @@ describe('GiftServices.findList', () => {
      });
 
      it('should throw 404 if list is not found', async () => {
-          // findListById retourne null
           (listEventServices.findListById as any) = async () => null;
 
-          await expect(service.findList(userId, listId))
-               .rejects.toThrow(TypeError); // Erreur de type car on essaie d'accéder à id_event sur null
+          expect(service.findList(userId, listId))
+               .rejects.toThrow(TypeError);
      });
 
      it('should propagate error from findListById', async () => {
-          // findListById génère une erreur
           (listEventServices.findListById as any) = async () => {
                throw new Error('List lookup failure');
           };
@@ -589,14 +577,12 @@ describe('GiftServices.findList', () => {
      it('should throw 401 if user does not have permission', async () => {
           const errMsg = 'Vous ne pouvez pas voir la liste de cadeaux';
 
-          // findListById réussit
           (listEventServices.findListById as any) = async () => mockListEvent;
-          // findParticipantByUserIdAndEventId échoue avec 401
           (participantServices.findParticipantByUserIdAndEventId as any) = async () => {
                throw throwError(401, errMsg);
           };
 
-          await expect(service.findList(userId, listId))
+          expect(service.findList(userId, listId))
                .rejects.toMatchObject({
                     status: 401,
                     error: { error: errMsg }
@@ -604,14 +590,12 @@ describe('GiftServices.findList', () => {
      });
 
      it('should propagate error from findParticipantByUserIdAndEventId', async () => {
-          // findListById réussit
           (listEventServices.findListById as any) = async () => mockListEvent;
-          // findParticipantByUserIdAndEventId génère une erreur
           (participantServices.findParticipantByUserIdAndEventId as any) = async () => {
                throw new Error('Participant lookup failure');
           };
 
-          await expect(service.findList(userId, listId))
+          expect(service.findList(userId, listId))
                .rejects.toThrow('Participant lookup failure');
      });
 });
