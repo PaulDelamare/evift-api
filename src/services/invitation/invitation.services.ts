@@ -197,7 +197,7 @@ export class InvitationServices extends BaseService {
           })
 
           if (!invitation && checkError) {
-               return throwError(404, "Invitation non trouvée");
+               throw throwError(404, "Invitation non trouvée");
           }
 
           return invitation;
