@@ -129,5 +129,41 @@ export class FriendsServices extends BaseService {
                },
           });
      }
+
+     /**
+      * Deletes a friendship between two users.
+      *
+      * Searches for a friendship record between the given `userId` and `id` (regardless of order).
+      * If the friendship exists, deletes it from the database.
+      * Throws a 404 error if the friendship is not found.
+      *
+      * @param userId - The ID of the first user.
+      * @param id - The ID of the second user.
+      * @throws {Error} Throws a 404 error if the friendship is not found.
+      */
+     public async deleteFriends(userId: string, id: string) {
+          const friend = await this.db.friends.findFirst({
+               where: {
+                    OR: [
+                         {
+                              user1Id: userId,
+                              user2Id: id,
+                         },
+                         {
+                              user1Id: id,
+                              user2Id: userId,
+                         },
+                    ],
+               },
+          });
+
+          if (!friend) {
+               throw throwError(404, "Amitié non trouvée");
+          }
+
+          await this.db.friends.delete({
+               where: { id: friend.id },
+          });
+     }
 }
 
