@@ -116,7 +116,7 @@ export class GiftServices extends BaseService {
           gifts: Array<{
                name: string;
                quantity: number;
-               url?: string;
+               url: string | null;
           }>;
      }) {
           const giftsData = body.gifts.map(gift => ({
@@ -280,6 +280,66 @@ export class GiftServices extends BaseService {
                     id_userTaken: checked ? userId : null
                }
           });
+     }
+
+     /**
+      * Deletes a gift from the database for a specific user.
+      *
+      * @param idGift - The unique identifier of the gift to be deleted.
+      * @param idUser - The unique identifier of the user who owns the gift.
+      * @returns A promise that resolves when the gift has been deleted.
+      */
+     public async deleteGift(idGift: string, idUser: string): Promise<void> {
+          await this.db.gifts.delete({
+               where: { id: idGift, id_user: idUser }
+          });
+     }
+
+     /**
+      * Deletes a gift list for a specific user.
+      *
+      * @param idList - The unique identifier of the gift list to delete.
+      * @param idUser - The unique identifier of the user who owns the gift list.
+      * @returns A promise that resolves when the gift list has been deleted.
+      */
+     public async deleteList(idList: string, idUser: string): Promise<void> {
+          await this.db.listGift.delete({
+               where: { id: idList, id_user: idUser }
+          });
+     }
+
+     /**
+      * Adds multiple gifts to a specified gift list for a user.
+      *
+      * @param body - An object containing the gift list ID and an array of gifts to add.
+      * @param body.id - The ID of the gift list to which gifts will be added.
+      * @param body.gifts - An array of gift objects, each containing a name, quantity, and optional URL.
+      * @param userId - The ID of the user adding the gifts.
+      * @returns A promise that resolves to the result of the bulk creation operation.
+      */
+     public async addGift(body: {
+          id: string;
+          gifts: Array<{
+               name: string;
+               quantity: number;
+               url: string | null;
+          }>;
+     }, userId: string) {
+
+          const giftsData = body.gifts.map(gift => ({
+               name: gift.name,
+               quantity: gift.quantity,
+               url: gift.url ?? '',
+               id_user: userId,
+               id_list: body.id
+          }));
+
+          const createdList = await this.db.gifts.createMany({
+               data: giftsData,
+               skipDuplicates: true,
+          });
+
+          return createdList;
      }
 }
 

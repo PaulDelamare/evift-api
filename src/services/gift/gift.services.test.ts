@@ -835,4 +835,92 @@ describe('GiftServices.checkGift', () => {
     });
 });
 
+describe('GiftServices.deleteGift', () => {
+	it('should call db.gifts.delete with the correct where clause', async () => {
+		let calledWith: any = null;
+		const dbStub = {
+			gifts: {
+				delete: async (args: any) => {
+					calledWith = args;
+				}
+			}
+		};
+		const service = new GiftServices(dbStub as any);
+
+		await service.deleteGift('gift-123', 'user-456');
+
+		expect(calledWith).toEqual({
+			where: { id: 'gift-123', id_user: 'user-456' }
+		});
+	});
+});
+
+describe('GiftServices.deleteList', () => {
+	it('should call db.listGift.delete with the correct where clause', async () => {
+		let calledWith: any = null;
+		const dbStub = {
+			listGift: {
+				delete: async (args: any) => {
+					calledWith = args;
+				}
+			}
+		};
+		const service = new GiftServices(dbStub as any);
+
+		await service.deleteList('list-789', 'user-456');
+
+		expect(calledWith).toEqual({
+			where: { id: 'list-789', id_user: 'user-456' }
+		});
+	});
+});
+
+describe('GiftServices.addGift', () => {
+	it('should transform body.gifts into data array and call createMany', async () => {
+		const body = {
+			id: 'list-123',
+			gifts: [
+				{ name: 'Teddy', quantity: 2, url: 'http://toy.com/teddy' },
+				{ name: 'Ball', quantity: 1, url: null }
+			]
+		};
+		let calledWith: any = null;
+		const dbStub = {
+			gifts: {
+				createMany: async (args: any) => {
+					calledWith = args;
+					return { count: args.data.length };
+				}
+			}
+		};
+		const service = new GiftServices(dbStub as any);
+
+		const result = await service.addGift(body, 'user-999');
+
+		// Vérifie le retour
+		expect(result).toEqual({ count: 2 });
+
+		// Vérifie la transformation des données
+		expect(calledWith).toEqual({
+			data: [
+				{
+					name: 'Teddy',
+					quantity: 2,
+					url: 'http://toy.com/teddy',
+					id_user: 'user-999',
+					id_list: 'list-123'
+				},
+				{
+					name: 'Ball',
+					quantity: 1,
+					url: '',
+					id_user: 'user-999',
+					id_list: 'list-123'
+				}
+			],
+			skipDuplicates: true
+		});
+	});
+});
+
 
