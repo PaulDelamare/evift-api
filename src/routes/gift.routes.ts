@@ -248,7 +248,7 @@ export const gift = new Elysia({ prefix: "/gift" })
      )
 
      .post(
-          "/addGift/:idGift",
+          "/addGift",
 
           async (ctx) => {
                try {
