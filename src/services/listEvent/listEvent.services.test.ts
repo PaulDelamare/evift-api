@@ -46,7 +46,7 @@ describe('ListEventServices.checkIfListInEvent', () => {
                .rejects.toMatchObject({
                     status: 401,
                     error: {
-                         error: 'Vous avez déja ajouter ce cadeaux à cet évènement',
+                         error: 'Vous avez déjà ajouté ce cadeau à cet événement',
                     },
                });
      });
