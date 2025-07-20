@@ -60,21 +60,6 @@ export const apiConfig = (app: Elysia) => {
                })
           )
 
-          .use(
-               cors({
-                    origin: "http://localhost:5173",
-                    methods: ["GET", "POST", "PUT", "DELETE"],
-                    allowedHeaders: [
-                         "Content-Type",
-                         "Authorization",
-                         "x-api-key",
-                         "accept",
-                         "origin",
-                         "x-requested-with",
-                    ],
-               })
-          )
-
           .use(opentelemetry())
           .use(rateLimit({
                max: 200,
