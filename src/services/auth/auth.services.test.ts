@@ -252,7 +252,7 @@ describe('AuthServices.register', () => {
                status: 400,
                error: 'Cet email est déjà utilisé !'
           });
-     })
+     });
 
      it('should create new user and send confirmation email when email is free', async () => {
 
