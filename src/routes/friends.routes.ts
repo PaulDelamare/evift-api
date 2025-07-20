@@ -38,4 +38,28 @@ export const friends = new Elysia({ prefix: "/friends" })
                 summary: 'Get all friends of a user',
             },
         }
-    );
+    )
+
+    .delete(
+        "/delete/:id",
+
+        async (ctx) => {
+            try {
+                await ctx.friendsServices.deleteFriends(ctx.user.id, ctx.params.id);
+
+                return sendResponse(ctx, 200, 'Ami supprimé avec succès');
+            } catch (error) {
+                const { status, error: errorResponse } = handleError(error);
+                throw ctx.error(status, errorResponse);
+            }
+        },
+        {
+            params: t.Object({
+                id: t.String({ format: "uuid", errors: "L'id de l'ami n'est pas valide" }),
+            }),
+            detail: {
+                tags: ['Friends'],
+                summary: 'Delete a friend by ID',
+            },
+        }
+    )
