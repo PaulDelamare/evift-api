@@ -196,3 +196,77 @@ export const gift = new Elysia({ prefix: "/gift" })
                }),
           }
      )
+
+     .delete('/deleteGift/:idGift',
+
+          async (ctx) => {
+               try {
+
+                    await ctx.giftServices.deleteGift(ctx.params.idGift, ctx.user.id);
+                    return sendResponse(ctx, 200, "Cadeau supprimé avec succès");
+
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               detail: {
+                    tags: ['Gift'],
+                    summary: 'Delete a user gift'
+               },
+               params: t.Object({
+                    idGift: t.String({ format: "uuid", errors: "L'id du cadeau n'est pas valide" })
+               }),
+          }
+     )
+
+     .delete('/deleteList/:idList',
+
+          async (ctx) => {
+               try {
+
+                    await ctx.giftServices.deleteList(ctx.params.idList, ctx.user.id);
+                    return sendResponse(ctx, 200, "Liste de cadeaux supprimée avec succès");
+
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               detail: {
+                    tags: ['Gift'],
+                    summary: 'Delete a user gift list'
+               },
+               params: t.Object({
+                    idList: t.String({ format: "uuid", errors: "L'id de la liste n'est pas valide" })
+               }),
+          }
+     )
+
+     .post(
+          "/addGift/:idGift",
+
+          async (ctx) => {
+               try {
+
+                    await ctx.giftServices.addGift(ctx.body, ctx.user.id);
+                    return sendResponse(ctx, 200, "Cadeau ajouté avec succès");
+
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               detail: {
+                    tags: ['Gift'],
+                    summary: 'Add a user gift'
+               },
+               body: 'addGift'
+          }
+     )
