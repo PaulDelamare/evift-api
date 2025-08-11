@@ -209,7 +209,7 @@ export class InvitationServices extends BaseService {
       * @param userId - The ID of the user whose invitation notifications are to be counted.
       * @returns A promise that resolves to the number of invitation notifications for the given user.
       */
-     public async countNotification(userId: string){
+     public async countNotification(userId: string) {
           return await this.db.invitation.count({
                where: {
                     requestId: userId
