@@ -46,12 +46,14 @@ export class EventInvitationServices extends BaseService {
           organizerId: string,
           eventId: string
      ): Promise<void> {
+
           const organizerEvent = await this.participantServices.findParticipantByUserIdAndEventId(
                organizerId,
                eventId,
                false,
                true
           );
+
           if (!organizerEvent || (organizerEvent.roleRef.name !== "admin" && organizerEvent.roleRef.name !== "superAdmin")) {
                throw throwError(403, "Vous n'avez pas le droit d'inviter des utilisateurs");
           }
@@ -70,11 +72,7 @@ export class EventInvitationServices extends BaseService {
           ]);
 
           if (participants.some(participant => participant)) {
-               throw throwError(400, "Tous les utilisateurs invités ne sont pas autorisés à participer à cet événement");
-          }
-
-          if (friends.some(friend => !friend)) {
-               throw throwError(400, "Tous les utilisateurs invités ne sont pas vos amis");
+               throw throwError(400, "Certains utilisateurs invités ne sont pas autorisés à participer à cet événement");
           }
 
           await this.checkUserAlreadyInvited(invitationsId, eventId);
@@ -190,7 +188,9 @@ export class EventInvitationServices extends BaseService {
           const participantRole = await this.roleEventServices.findRoleEvent("participant")
 
           if (response) {
-               await this.participantServices.addNewParticipant(eventId, userId, participantRole!.id)
+               await this.friendsServices.addFriends(userId, invitation.id_organizer);
+               await this.invitationServices.deleteByRequestId(invitation.id_user);
+               await this.participantServices.addNewParticipant(eventId, userId, participantRole!.id);
           }
 
           await this.deleteEventInvitation(invitation.id)
