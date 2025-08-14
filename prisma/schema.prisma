@@ -91,7 +91,7 @@ model Participant {
   roleRef RoleEvent @relation(fields: [id_role], references: [id], onDelete: Cascade)
   id_role String
 
-  user    User   @relation(fields: [id_user], references: [id] , onDelete: Cascade)
+  user    User   @relation(fields: [id_user], references: [id], onDelete: Cascade)
   id_user String
 
   eventList ListEvent[]
@@ -106,7 +106,7 @@ model EventInvitation {
   event    Event  @relation(fields: [id_event], references: [id], onDelete: Cascade)
   id_event String
 
-  idUser  User   @relation("userEventInvitation", fields: [id_user], references: [id], onDelete: Cascade)
+  user  User   @relation("userEventInvitation", fields: [id_user], references: [id], onDelete: Cascade)
   id_user String
 
   idOrganizer  User   @relation("userEventOrganizer", fields: [id_organizer], references: [id], onDelete: Cascade)
@@ -163,6 +163,16 @@ model ListEvent {
   id_list String
   list    ListGift @relation(fields: [id_list], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RequestAccount {
+  id        String   @id @unique @default(uuid())
+  email     String   @unique
+  token     String
+  id_friend String[]
+  eventRequests Json[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

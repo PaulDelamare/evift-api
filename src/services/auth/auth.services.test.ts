@@ -1,13 +1,17 @@
+import { mock } from "bun:test";
+
+// Mock AVANT d'importer le service pour que la fonction soit remplacée
+mock.module("../../lib/utils/hashPassword/hashPassword", () => ({
+     hashPassword: async () => "hashedPwd"
+}));
+
 import { User } from '@prisma/client';
 import { describe, it, expect, beforeEach, afterEach, spyOn } from 'bun:test';
-// @ts-ignore
 import { AuthServices } from './auth.services';
-import * as mailer from '../../email/sendEmail'; // ajuste le chemin si nécessaire
-
+import * as mailer from '../../email/sendEmail';
 
 describe('AuthServices.checkUserExists', () => {
      it('should return the user object when found', async () => {
-
           const fakeUser: User = {
                id: "uuid",
                email: 'test@example.com',
@@ -21,29 +25,24 @@ describe('AuthServices.checkUserExists', () => {
 
           const dbStub = {
                user: {
-                    findUnique: (args: any) => Promise.resolve(fakeUser)
+                    findUnique: () => Promise.resolve(fakeUser)
                }
           };
 
           const repo = new AuthServices(dbStub as any);
-
           const result = await (repo as any).checkUserExists('test@example.com');
-
           expect(result).toEqual(fakeUser);
      });
 
      it('should return null when no user is found', async () => {
-
           const dbStub = {
                user: {
-                    findUnique: (args: any) => Promise.resolve(null)
+                    findUnique: () => Promise.resolve(null)
                }
           };
 
           const repo = new AuthServices(dbStub as any);
-
           const result = await (repo as any).checkUserExists('nouser@example.com');
-
           expect(result).toBeNull();
      });
 });
@@ -62,18 +61,14 @@ describe('AuthServices.checkUserPassword', () => {
      });
 
      it('should return true when passwords match', async () => {
-          Bun.password.verify = async (plain: string, hash: string) => true;
-
+          Bun.password.verify = async () => true;
           const result = await (repo as any).checkUserPassword('secret', 'hashedSecret');
-
           expect(result).toBe(true);
      });
 
      it('should return false when passwords do not match', async () => {
-          Bun.password.verify = async (plain: string, hash: string) => false;
-
+          Bun.password.verify = async () => false;
           const result = await (repo as any).checkUserPassword('wrong', 'hashedSecret');
-
           expect(result).toBe(false);
      });
 });
@@ -92,10 +87,8 @@ describe('AuthServices.login', () => {
 
      it('should return the user object without the password on successful login', async () => {
           const repo = new AuthServices({} as any);
-          // @ts-ignore
-          repo.checkUserExists = async (email: string) => validUser;
-          // @ts-ignore
-          repo.checkUserPassword = async (plain: string, hash: string) => true;
+          (repo as any).checkUserExists = async () => validUser;
+          (repo as any).checkUserPassword = async () => true;
 
           const result = await repo.login({ email: validUser.email, password: 'plainPassword' });
 
@@ -112,12 +105,11 @@ describe('AuthServices.login', () => {
 
      it('should throw error 400 when the user does not exist', async () => {
           const repo = new AuthServices({} as any);
-          // @ts-ignore
-          repo.checkUserExists = async (email: string) => null;
+          (repo as any).checkUserExists = async () => null;
 
           try {
                await repo.login({ email: 'noone@example.com', password: 'any' });
-               throw new Error('Expected login to throw'); // should not reach
+               throw new Error('Expected login to throw');
           } catch (err: any) {
                expect(err.status).toBe(400);
                expect(err.error.error).toBe("L'adresse email ou le mot de passe est incorrect");
@@ -126,91 +118,33 @@ describe('AuthServices.login', () => {
 
      it('should throw error 400 when the password is incorrect', async () => {
           const repo = new AuthServices({} as any);
-          // @ts-ignore
-          repo.checkUserExists = async (email: string) => validUser;
-          // @ts-ignore
-          repo.checkUserPassword = async (plain: string, hash: string) => false;
+          (repo as any).checkUserExists = async () => validUser;
+          (repo as any).checkUserPassword = async () => false;
 
           try {
-
                await repo.login({ email: validUser.email, password: 'wrongPassword' });
                throw new Error('Expected login to throw');
-
           } catch (err: any) {
-
-
                expect(err.status).toBe(400);
                expect(err.error.error).toBe("L'adresse email ou le mot de passe est incorrect");
           }
      });
-
-     describe('AuthServices.hashPassword', () => {
-          let originalHash: typeof Bun.password.hash;
-          let repo: AuthServices;
-
-          beforeEach(() => {
-               originalHash = Bun.password.hash;
-               repo = new AuthServices({} as any);
-          });
-
-          afterEach(() => {
-               Bun.password.hash = originalHash;
-          });
-
-          it('should return the hashed password string', async () => {
-               Bun.password.hash = async (pwd: string) => 'simulatedHash';
-
-               const result = await (repo as any).hashPassword('myPassword');
-
-               expect(result).toBe('simulatedHash');
-          });
-
-          it('should pass through errors from Bun.password.hash', async () => {
-               Bun.password.hash = async () => { throw new Error('Hash failure'); };
-
-               try {
-
-                    await (repo as any).hashPassword('badPassword');
-                    throw new Error('Expected hashPassword to throw');
-
-               } catch (err: any) {
-
-                    expect(err.message).toBe('Hash failure');
-               }
-          });
-     });
 });
 
 describe('AuthServices.register', () => {
-     const input = {
-          firstname: 'Alice',
-          lastname: 'Smith',
-          email: 'alice@example.com',
-          password: 'plainPassword'
-     };
-
      let repo: AuthServices;
-     let originalHash: typeof AuthServices.prototype['hashPassword'];
-     let originalCheck: typeof AuthServices.prototype['checkUserExists'];
      let sendEmailSpy: any;
 
      beforeEach(() => {
-
           repo = new AuthServices({ user: { create: () => Promise.resolve(null) } } as any);
-
-          originalHash = (repo as any).hashPassword;
-          originalCheck = (repo as any).checkUserExists;
           sendEmailSpy = spyOn(mailer, 'sendEmail');
      });
 
      afterEach(() => {
-          (repo as any).hashPassword = originalHash;
-          (repo as any).checkUserExists = originalCheck;
           sendEmailSpy.mockRestore();
      });
 
      it('should return status 400 and error when email is already used', async () => {
-          // 1) Stubs de dépendances
           const fakeUser = {
                id: 'uuid-1234',
                email: 'alice@example.com',
@@ -222,49 +156,40 @@ describe('AuthServices.register', () => {
                firstLogin: false
           };
 
-          // simulate une vérif d’existant et un hash
-          const checkUserExists = async (email: string) =>
+          (repo as any).checkUserExists = async (email: string) =>
                email === fakeUser.email ? fakeUser : null;
-          const hashPassword = async (pwd: string) => 'hash';
 
-          // 2) Implémentation inline de register
-          async function register(input: {
-               email: string;
-               password: string;
-               firstname: string;
-               lastname: string;
-          }) {
-               if (await checkUserExists(input.email)) {
-                    return { status: 400, error: 'Cet email est déjà utilisé !' };
-               }
-               // … reste de la logique (non nécessaire pour ce test)
+          try {
+               await repo.register({
+                    email: 'alice@example.com',
+                    password: 'pwd',
+                    firstname: 'Alice',
+                    lastname: 'Smith'
+               });
+               throw new Error('Should have thrown'); // ne doit jamais passer ici
+          } catch (err) {
+               console.log('💥 Caught in test:', err);
+               expect(err).toMatchObject({
+                    status: 400,
+                    error: { error: 'Cet email est déjà utilisé !' }
+               });
           }
-
-          // 3) Appel et assertion
-          const result = await register({
-               email: 'alice@example.com',
-               password: 'pwd',
-               firstname: 'Alice',
-               lastname: 'Smith'
-          });
-
-          expect(result).toEqual({
-               status: 400,
-               error: 'Cet email est déjà utilisé !'
-          });
      });
 
-     it('should create new user and send confirmation email when email is free', async () => {
 
-          const hashed = 'hashedPwd';
-          (repo as any).hashPassword = async () => hashed;
-          (repo as any).checkUserExists = async () => null;
+     it('should create new user and send confirmation email when email is free', async () => {
+          const input = {
+               email: "alice@example.com",
+               firstname: "Alice",
+               lastname: "Smith",
+               password: "myPwd"
+          };
 
           let createdData: any = null;
           const newUser: User = {
                id: "uuid-1234",
                email: input.email,
-               password: hashed,
+               password: "hashedPwd",
                firstname: input.firstname,
                lastname: input.lastname,
                createdAt: new Date('2025-06-01T00:00:00Z'),
@@ -280,19 +205,27 @@ describe('AuthServices.register', () => {
                     }
                }
           } as any);
-          (repo as any).hashPassword = async () => hashed;
+
           (repo as any).checkUserExists = async () => null;
 
           let emailArgs: any = null;
+          interface SendEmailArgs {
+               to: string;
+               sender: string;
+               subject: string;
+               template: string;
+               context: Record<string, any>;
+          }
+
           sendEmailSpy.mockImplementation(
                async (
                     to: string,
                     sender: string,
                     subject: string,
                     template: string,
-                    context: { firstname: string; emailService: string }
+                    context: Record<string, any>
                ): Promise<void> => {
-                    emailArgs = { to, sender, subject, template, context };
+                    emailArgs = { to, sender, subject, template, context } as SendEmailArgs;
                }
           );
 
@@ -302,7 +235,7 @@ describe('AuthServices.register', () => {
                email: input.email,
                firstname: input.firstname,
                lastname: input.lastname,
-               password: hashed
+               password: "hashedPwd" // vient bien du mock
           });
 
           expect(emailArgs).toEqual({

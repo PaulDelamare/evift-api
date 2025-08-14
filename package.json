@@ -17,6 +17,7 @@
     "@prisma/client": "^6.6.0",
     "elysia": "latest",
     "elysia-rate-limit": "^4.1.0",
+    "elysia-xss": "^1.0.3",
     "handlebars": "^4.7.8",
     "mongoose": "^8.4.5",
     "nodemailer": "^6.9.13",
