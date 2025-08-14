@@ -1,11 +1,12 @@
 // ! IMPORTS
 import { Elysia, t } from "elysia";
-import { auth } from "./routes/auth.routes";
+import { auth, authLogged } from "./routes/auth.routes";
 import { user } from "./routes/user.routes";
 import { invite } from "./routes/invitation.routes";
 import { friends } from "./routes/friends.routes";
 import { event } from "./routes/event.routes";
 import { gift } from "./routes/gift.routes";
+import { requestAccount } from "./routes/requestAccount.routes";
 import { rolesEvent } from "./routes/rolesEvent.routes";
 import { apiConfig } from "./config/api-config";
 import { checkApiKey } from "./plugins/checkApiKey";
@@ -62,12 +63,14 @@ const app = new Elysia()
           app
                .use(checkApiKey)
                .use(auth)
+               .use(authLogged)
                .use(user)
                .use(invite)
                .use(friends)
                .use(event)
                .use(rolesEvent)
                .use(gift)
+               .use(requestAccount)
      )
 
      .listen(port);
