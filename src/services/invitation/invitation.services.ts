@@ -123,11 +123,25 @@ export class InvitationServices extends BaseService {
       * @returns A promise that resolves when the invitation has been created.
       * @throws Will throw an error if the database operation fails.
       */
-     private async createInvitation(userId: string, id: string) {
+     public async createInvitation(userId: string, id: string) {
           await this.db.invitation.create({
                data: {
                     userId: userId,
                     requestId: id,
+               },
+          });
+     }
+
+     /**
+      * Deletes all invitation records associated with the specified request ID.
+      *
+      * @param requestId - The unique identifier of the request whose invitations should be deleted.
+      * @returns A promise that resolves when the deletion operation is complete.
+      */
+     public async deleteByRequestId(requestId: string) {
+          await this.db.invitation.deleteMany({
+               where: {
+                    requestId: requestId,
                },
           });
      }
