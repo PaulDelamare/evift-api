@@ -108,6 +108,31 @@ export const event = new Elysia({ prefix: "/event" })
           }
      )
 
+     .get(
+          "/inviteUserForEvent/:id",
+          async (ctx) => {
+               try {
+
+                    const inviteUsers = await ctx.eventServices.inviteUserForEvent(ctx.params.id);
+                    return sendResponse(ctx, 200, inviteUsers);
+
+               } catch (error) {
+
+                    const { status, error: errorResponse } = handleError(error);
+                    throw ctx.error(status, errorResponse);
+               }
+          },
+          {
+               params: t.Object({
+                    id: t.String({ format: "uuid", error: "L'id doit être un uuid" }),
+               }),
+               detail: {
+                    tags: ['Event'],
+                    summary: 'Invite a user to an event',
+               }
+          }
+     )
+
      .patch(
           "/updateParticipant",
           async (ctx) => {
