@@ -7,8 +7,23 @@ import { jwtConfig } from "../plugins/jwtAuth/jwtConfig";
 import { AuthServices } from "../services/auth/auth.services";
 import { handleError } from "../lib/utils/errorHandler/errorHandler";
 import { sendResponse } from "../lib/utils/returnSuccess/returnSuccess";
+import { rateLimit } from "elysia-rate-limit";
 
 export const auth = new Elysia({ prefix: "/auth" })
+     .use(rateLimit({
+          max: 5,
+          errorResponse: new Response(
+               JSON.stringify({
+                    error: { error: 'Trop de requêtes. Réessayez plus tard.' },
+                    message: "Trop de requêtes. Réessayez plus tard."
+               }),
+               {
+                    status: 429,
+                    headers: { 'Content-Type': 'application/json' }
+               }
+          ),
+          countFailedRequest: true,
+     }))
 
      .use(userModel)
 
@@ -16,12 +31,14 @@ export const auth = new Elysia({ prefix: "/auth" })
 
      .use(jwtConfig)
 
+
      .post(
           "/login",
 
           async (ctx) => {
 
                try {
+
                     const user = await ctx.authServices.login(ctx.body);
 
                     const accessJWTToken = await ctx.jwt.sign({
@@ -78,7 +95,14 @@ export const auth = new Elysia({ prefix: "/auth" })
                }
           })
 
-     // ? Use Plugin for check if user is logged 
+
+
+export const authLogged = new Elysia({ prefix: "/auth" })
+
+     .decorate('authServices', new AuthServices())
+
+     .use(jwtConfig)
+
      .use(authPlugin)
 
      .get('/me', ({ user }) => {
