@@ -2,6 +2,7 @@ import { throwError } from "../../lib/utils/errorHandler/errorHandler";
 import { User } from "@prisma/client";
 import { sendEmail } from "../../email/sendEmail";
 import { BaseService } from "../base.services";
+import { hashPassword } from "../../lib/utils/hashPassword/hashPassword";
 
 /**
  * Service class for Auth operations
@@ -15,7 +16,7 @@ export class AuthServices extends BaseService {
       * @param email - The email address of the user to search for.
       * @returns A promise that resolves to the user object if found, or null if no user exists with the given email.
       */
-     private async checkUserExists(email: User['email']): Promise<User | null> {
+     public async checkUserExists(email: User['email']): Promise<User | null> {
           return this.db.user.findUnique({
                where: { email }, select: {
                     id: true,
@@ -71,15 +72,15 @@ export class AuthServices extends BaseService {
      }
 
 
-     /**
-      * Hashes a plain text password using Bun's password hashing utility.
-      *
-      * @param password - The plain text password to be hashed.
-      * @returns A promise that resolves to the hashed password as a string.
-      */
-     private async hashPassword(password: string): Promise<string> {
-          return Bun.password.hash(password);
-     }
+     // /**
+     //  * Hashes a plain text password using Bun's password hashing utility.
+     //  *
+     //  * @param password - The plain text password to be hashed.
+     //  * @returns A promise that resolves to the hashed password as a string.
+     //  */
+     // private async hashPassword(password: string): Promise<string> {
+     //      return Bun.password.hash(password);
+     // }
 
      /**
       * Registers a new user with the provided details.
@@ -94,7 +95,7 @@ export class AuthServices extends BaseService {
       */
      public async register(body: { firstname: string; lastname: string; email: string; password: string }) {
 
-          const hashedPassword = await this.hashPassword(body.password);
+          const hashedPassword = await hashPassword(body.password);
 
           const alreadyUser = await this.checkUserExists(body.email);
 
