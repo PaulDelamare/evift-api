@@ -1,4 +1,3 @@
-// !IMPORTS
 import Elysia from "elysia";
 import { bdd } from "../../lib/prisma";
 import { jwtConfig } from "./jwtConfig";
@@ -13,30 +12,37 @@ import { jwtConfig } from "./jwtConfig";
 const authPlugin = (app: Elysia) =>
     app
         .use(jwtConfig)
-
         .derive(async ({ jwt, cookie: { accessToken }, set }) => {
-
-            if (!accessToken.value) {
-
+            if (!accessToken || !accessToken.value) {
                 set.status = 401;
-
                 throw new Error("Vous devez vous authentifier");
             }
 
-            const jwtPayload = await jwt.verify(accessToken.value);
+            let jwtPayload;
+            try {
+                jwtPayload = await jwt.verify(accessToken.value);
+            } catch {
+                set.status = 403;
+                throw new Error("Accès invalide");
+            }
+
             if (!jwtPayload) {
                 set.status = 403;
-
                 throw new Error("Accès invalide");
             }
 
             const userId = jwtPayload.sub;
-            const user = await bdd.user.findUnique({
-                where: {
-                    id: userId,
-                },
-                select: { id: true, email: true, firstname: true, lastname: true, createdAt: true, firstLogin: true },
-            });
+
+            let user;
+            try {
+                user = await bdd.user.findUnique({
+                    where: { id: userId },
+                    select: { id: true, email: true, firstname: true, lastname: true, createdAt: true, firstLogin: true },
+                });
+            } catch {
+                set.status = 500;
+                throw new Error("Erreur interne lors de la récupération de l'utilisateur");
+            }
 
             if (!user) {
                 set.status = 403;
