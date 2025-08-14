@@ -6,6 +6,7 @@ import { cors } from '@elysiajs/cors';
 import pino from 'pino';
 import fs from 'fs';
 import path from 'path';
+import { elysiaXSS } from 'elysia-xss'
 
 const logDir = path.join(process.cwd(), 'logs');
 
@@ -35,13 +36,14 @@ export const apiConfig = (app: Elysia) => {
                     },
                })
           )
+          .use(elysiaXSS({ as: "global" }))
           .get('/image', ({ query }) => Bun.file(query.name), {
                query: t.Object({
                     name: t.String()
                }),
                detail: {
                     tags: ['Image'],
-                    summary: 'Create sipple path for get Image form API'
+                    summary: 'Create simple path for get Image from API'
                },
           })
 
@@ -62,9 +64,20 @@ export const apiConfig = (app: Elysia) => {
 
           .use(opentelemetry())
           .use(rateLimit({
-               max: 200,
-               errorResponse: 'Vous avez atteint la limite de requêtes'
-          }));
+               max: 100,
+               errorResponse: new Response(
+                    JSON.stringify({
+                         error: { error: 'Trop de requêtes. Réessayez plus tard.' },
+                         message: "Trop de requêtes. Réessayez plus tard."
+                    }),
+                    {
+                         status: 429,
+                         headers: { 'Content-Type': 'application/json' }
+                    }
+               ),
+               countFailedRequest: true,
+
+          }))
 };
 
 // Export d'une instance de logger pour utilisation ailleurs dans l'application
