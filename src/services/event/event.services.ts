@@ -138,6 +138,21 @@ export class EventServices extends BaseService {
      }
 
      /**
+      * Retrieves all event invitations for a specified event.
+      *
+      * @param id_event - The unique identifier of the event for which to fetch invitations.
+      * @returns A promise that resolves to an array of event invitations, each including the associated user information.
+      */
+     public async inviteUserForEvent(id_event: string) {
+          return await this.db.eventInvitation.findMany({
+               where: { id_event: id_event },
+               include: {
+                    user: true
+               }
+          });
+     }
+
+     /**
       * Updates the role of a participant in a specific event.
       *
       * This method checks the permissions of the requester to ensure they have the rights
