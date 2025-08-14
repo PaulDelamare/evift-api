@@ -35,7 +35,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
                body: t.Object({
                     id: t.String({
                          format: "uuid",
-                         error: "L'adresse email est invalide",
+                         error: "L'id est invalide",
                     }),
                }),
                detail: {
