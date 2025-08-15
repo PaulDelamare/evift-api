@@ -11,7 +11,7 @@ import { rateLimit } from "elysia-rate-limit";
 
 export const auth = new Elysia({ prefix: "/auth" })
      .use(rateLimit({
-          max: 5,
+          max: 10,
           errorResponse: new Response(
                JSON.stringify({
                     error: { error: 'Trop de requêtes. Réessayez plus tard.' },
