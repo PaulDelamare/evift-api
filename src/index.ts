@@ -11,6 +11,7 @@ import { rolesEvent } from "./routes/rolesEvent.routes";
 import { apiConfig } from "./config/api-config";
 import { checkApiKey } from "./plugins/checkApiKey";
 import { message } from "./routes/webSocket/message.routes";
+import { bring } from "./routes/bringItem.services";
 
 const port = process.env.PORT!;
 
@@ -62,7 +63,7 @@ const app = new Elysia()
 
           app
                .use(checkApiKey)
-               .use(auth)
+
                .use(authLogged)
                .use(user)
                .use(invite)
@@ -71,6 +72,8 @@ const app = new Elysia()
                .use(rolesEvent)
                .use(gift)
                .use(requestAccount)
+               .use(bring)
+               .use(auth)
      )
 
      .listen(port);
