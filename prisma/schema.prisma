@@ -195,7 +195,6 @@ model BringItem {
 
   takers            Taken[]
   @@index([eventId])
-  @@unique([eventId, name])
 }
 
 model Taken {
@@ -208,5 +207,5 @@ model Taken {
   createdAt    DateTime  @default(now())
 
   @@index([bringItemId])
-  @@unique([bringItemId, userId]) // un seul enregistrement par user par item
+  @@unique([bringItemId, userId])
 }
