@@ -64,7 +64,7 @@ export const apiConfig = (app: Elysia) => {
 
           .use(opentelemetry())
           .use(rateLimit({
-               max: 100,
+               max: 200,
                errorResponse: new Response(
                     JSON.stringify({
                          error: { error: 'Trop de requêtes. Réessayez plus tard.' },
