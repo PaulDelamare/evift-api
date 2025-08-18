@@ -33,6 +33,8 @@ model User {
   userListGift        ListGift[]
   gifts               Gifts[]           @relation("gift")
   giftsTaken          Gifts[]           @relation("userTaken")
+  bringItemsCreatedBy BringItem[]       @relation("createdBy")
+  taken               Taken[]           // Opposite relation for Taken.user
   firstLogin          Boolean           @default(true)
 }
 
@@ -80,6 +82,7 @@ model Event {
   event       Participant[]
   invitation  EventInvitation[]
   listgift    ListEvent[]
+  bringItems  BringItem[]
 }
 
 model Participant {
@@ -175,4 +178,34 @@ model RequestAccount {
   eventRequests Json[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model BringItem {
+  id                String    @id @default(uuid())
+  event             Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId           String
+  name              String
+  requestedQuantity Int       @default(1)
+  isTaken           Boolean   @default(false)
+  takenAt           DateTime?
+  createdById       String?
+  createdBy         User?     @relation("createdBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  takers            Taken[]
+  @@index([eventId])
+}
+
+model Taken {
+  id           String    @id @default(uuid())
+  bringItem    BringItem @relation(fields: [bringItemId], references: [id], onDelete: Cascade)
+  bringItemId  String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  quantity     Int       @default(1)
+  createdAt    DateTime  @default(now())
+
+  @@index([bringItemId])
+  @@unique([bringItemId, userId])
 }

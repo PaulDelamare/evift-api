@@ -52,6 +52,7 @@ export async function sendEmail(
     const recipients = to.split(',').map(email => email.trim());
     
     data.url = process.env.API_URL;
+    data.siteUrl = process.env.SITE_URL;
 
     // Enregistrement des helpers handlebars de manière concise
     const helpers: Record<string, Handlebars.HelperDelegate> = {
