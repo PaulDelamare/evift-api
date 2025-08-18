@@ -168,7 +168,7 @@ describe('AuthServices.register', () => {
                });
                throw new Error('Should have thrown'); // ne doit jamais passer ici
           } catch (err) {
-               console.log('💥 Caught in test:', err);
+               console.info('💥 Caught in test:', err);
                expect(err).toMatchObject({
                     status: 400,
                     error: { error: 'Cet email est déjà utilisé !' }

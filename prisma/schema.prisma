@@ -36,6 +36,7 @@ model User {
   bringItemsCreatedBy BringItem[]       @relation("createdBy")
   taken               Taken[]           // Opposite relation for Taken.user
   firstLogin          Boolean           @default(true)
+  passwordResetToken PasswordResetToken[]
 }
 
 // Invitation model (Friends Request)
@@ -208,4 +209,13 @@ model Taken {
 
   @@index([bringItemId])
   @@unique([bringItemId, userId])
+}
+
+model PasswordResetToken {
+    id        String   @id @default(uuid())
+    userId    String   @unique
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    token     String   @unique
+    expiresAt DateTime
+    createdAt DateTime @default(now())
 }
