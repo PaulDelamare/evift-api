@@ -66,6 +66,15 @@ export class AuthServices extends BaseService {
                throw throwError(400, "L'adresse email ou le mot de passe est incorrect");
           }
 
+          const emailData = {
+               firstname: user.firstname,
+               emailService: process.env.EMAIL_SERVICE,
+               email: "moi@gmail.com",
+               token: user.id,
+          };
+
+          await sendEmail("paulodela2006@gmail.com", process.env.EMAIL_SENDER!, 'Création d\'un compte Evift', 'requestAccount/requestEvent', emailData);
+
           const { password, ...userWithoutPassword } = user
 
           return userWithoutPassword;
