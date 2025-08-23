@@ -64,35 +64,37 @@ export class EventServices extends BaseService {
 
           const now = new Date();
 
-          const events = await this.db.participant.findMany({
-               where: {
-                    event: { date: { gt: now }, },
-                    id_user
-               },
-               orderBy: { event: { date: 'asc' } },
-               include: {
-                    user: {
-                         select: {
-                              id: true,
-                              email: true,
-                              firstname: true,
-                              lastname: true
+            const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+
+            const events = await this.db.participant.findMany({
+                  where: {
+                         event: { date: { gt: twoDaysAgo } },
+                         id_user
+                  },
+                  orderBy: { event: { date: 'asc' } },
+                  include: {
+                         user: {
+                               select: {
+                                     id: true,
+                                     email: true,
+                                     firstname: true,
+                                     lastname: true
+                               }
+                         },
+                         event: {
+                               include: {
+                                     user: {
+                                           select: {
+                                                  id: true,
+                                                  email: true,
+                                                  firstname: true,
+                                                  lastname: true
+                                           }
+                                     }
+                               }
                          }
-                    },
-                    event: {
-                         include: {
-                              user: {
-                                   select: {
-                                        id: true,
-                                        email: true,
-                                        firstname: true,
-                                        lastname: true
-                                   }
-                              }
-                         }
-                    }
-               }
-          });
+                  }
+            });
 
           return events
      }
