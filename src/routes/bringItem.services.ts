@@ -36,7 +36,7 @@ export const bring = new Elysia({ prefix: "/bring" })
                }),
                detail: {
                     tags: ["BringItem"],
-                    summary: "Créer un produit à ramener pour un événement",
+                    summary: "Create an item to bring for an event",
                },
           }
      )
@@ -64,7 +64,7 @@ export const bring = new Elysia({ prefix: "/bring" })
                }),
                detail: {
                     tags: ["BringItem"],
-                    summary: "Prendre / mettre à jour une quantité pour un produit",
+                    summary: "Take / update a quantity for an item",
                },
           }
      )
@@ -91,7 +91,7 @@ export const bring = new Elysia({ prefix: "/bring" })
                }),
                detail: {
                     tags: ["BringItem"],
-                    summary: "Annuler sa prise pour un produit",
+                    summary: "Cancel your take for an item",
                },
           }
      )
@@ -116,7 +116,7 @@ export const bring = new Elysia({ prefix: "/bring" })
           {
                detail: {
                     tags: ["BringItem"],
-                    summary: "Lister les produits d'un événement et qui a pris quoi",
+                    summary: "List the products of an event and who took what",
                },
           }
      )
@@ -141,7 +141,7 @@ export const bring = new Elysia({ prefix: "/bring" })
           {
                detail: {
                     tags: ["BringItem"],
-                    summary: "Supprimer totalement un produit (créateur ou organisateur seulement)",
+                    summary: "Delete a product entirely (creator or organizer only)",
                },
           }
      );

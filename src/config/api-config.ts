@@ -49,8 +49,8 @@ export const apiConfig = (app: Elysia) => {
 
           .use(
                cors({
-                    origin: "http://localhost:5173",
-                    methods: ["GET", "POST", "PUT", "DELETE"],
+                    origin: "https://evift.fr",
+                    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
                     allowedHeaders: [
                          "Content-Type",
                          "Authorization",

@@ -39,7 +39,7 @@ export const requestAccount = new Elysia({ prefix: "/requestAccount" })
                }),
                detail: {
                     tags: ['Invitation'],
-                    summary: 'Create a new user account',
+                    summary: 'Creates a new user account and associates all existing invitations with this account.',
                }
           }
      )
@@ -69,7 +69,7 @@ export const requestAccount = new Elysia({ prefix: "/requestAccount" })
                }),
                detail: {
                     tags: ['Invitation'],
-                    summary: 'Send request for add friend to an other user or validate a reverse request',
+                    summary: 'Simply checks that the user has a valid invitation.',
                }
           }
      )
@@ -107,7 +107,7 @@ export const requestAccount = new Elysia({ prefix: "/requestAccount" })
                }),
                detail: {
                     tags: ['Invitation'],
-                    summary: 'Send request for add friend to an other user or validate a reverse request',
+                    summary: 'Send an invitation email to a user without an account. When the user creates their account, all invitations assigned to them will be available on the platform.',
                }
           }
      )
