@@ -5,6 +5,9 @@ import { ParticipantServices } from "../participant/participant.services";
 import { EventServices } from "../event/event.services";
 import { RoleEventServices } from "../roleEvent/roleEvent.services";
 import { InvitationServices } from "../invitation/invitation.services";
+import { sendEmail } from "../../email/sendEmail";
+import { formatDate, formatDateWithoutTime } from "../../lib/utils/formatDateError/formatDateError";
+import { Event, User } from "@prisma/client";
 
 /**
  * Service class for Event operations
@@ -58,7 +61,7 @@ export class EventInvitationServices extends BaseService {
                throw throwError(403, "Vous n'avez pas le droit d'inviter des utilisateurs");
           }
 
-          const [participants, friends] = await Promise.all([
+          const [participants] = await Promise.all([
                Promise.all(
                     invitationsId.map(userId =>
                          this.participantServices.findParticipantByUserIdAndEventId(userId, eventId, false, false)
@@ -79,6 +82,53 @@ export class EventInvitationServices extends BaseService {
 
           const invitationData = this.transformEventInvitationArray(invitationsId, eventId, organizerId);
           await this.createManyEventInvitation(invitationData);
+
+          await this.sendNotificationToInviteuser(invitationsId, organizerEvent.user, organizerEvent.event);
+     }
+
+     /**
+      * Sends event invitation notifications via email to a list of users.
+      *
+      * This method retrieves user details based on the provided invitation IDs,
+      * constructs the email content using event and user information, and sends
+      * an invitation email to each user.
+      *
+      * @param invitationsId - Array of user IDs to whom the invitations will be sent.
+      * @param user - The organizer's user information, including id, email, firstname, and lastname.
+      * @param event - The event details, including name, date, time, address, and description.
+      * @returns A Promise that resolves when all emails have been sent.
+      */
+     private async sendNotificationToInviteuser(invitationsId: string[], user: Pick<User, 'id' | 'email' | 'firstname' | 'lastname'>, event: Pick<Event, 'name' | 'date' | 'time' | 'address' | 'description'>) {
+          const users = await this.db.user.findMany({
+               where: { id: { in: invitationsId } },
+               select: { email: true, firstname: true, lastname: true }
+          });
+
+          for (const user of users) {
+               if (!user || !user.email) continue;
+
+               const emailData = {
+                    recipientFirstname: user.firstname ?? "",
+                    recipientLastname: user.lastname ?? "",
+                    organizerFirstname: user.firstname ?? "",
+                    organizerLastname: user.lastname ?? "",
+                    eventTitle: event?.name ?? "Événement Evift",
+                    eventDate: formatDateWithoutTime(event?.date),
+                    eventTime: event?.time,
+                    eventLocation: event?.address ?? "",
+                    eventDescription: event?.description ?? "",
+               };
+
+               const subject = `Invitation : ${event?.name ?? "événement"}`;
+
+               await sendEmail(
+                    user.email,
+                    process.env.EMAIL_SENDER!,
+                    subject,
+                    'invitation/eventInvitation',
+                    emailData
+               );
+          }
      }
 
      /**

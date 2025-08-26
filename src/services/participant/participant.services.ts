@@ -40,8 +40,24 @@ export class ParticipantServices extends BaseService {
                     id_user
                },
                include: {
-                    event,
-                    roleRef
+                    event: {
+                         select: {
+                              name: true,
+                              address: true,
+                              description: true,
+                              time: true,
+                              date: true,
+                         }
+                    },
+                    roleRef,
+                    user: {
+                         select: {
+                              id: true,
+                              email: true,
+                              firstname: true,
+                              lastname: true
+                         }
+                    }
                }
           });
 

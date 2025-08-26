@@ -22,7 +22,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
 
                try {
 
-                    const message = await ctx.invitationServices.invitationUser(ctx.body.id, ctx.user.id);
+                    const message = await ctx.invitationServices.invitationUser(ctx.body.id, ctx.user.id, ctx.user.firstname, ctx.user.email);
                     return sendResponse(ctx, 200, message);
 
                } catch (error) {
@@ -119,6 +119,7 @@ export const invite = new Elysia({ prefix: "/invitation" })
 
                } catch (error) {
 
+                    console.log(error)
                     const { status, error: errorResponse } = handleError(error);
                     throw ctx.error(status, errorResponse);
                }

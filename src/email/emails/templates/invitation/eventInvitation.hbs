@@ -1,0 +1,69 @@
+{{{header}}}
+
+<div class="body">
+     <h3 style="color:#004396; margin:0;">Vous êtes invité·e : {{eventTitle}}</h3>
+
+     <div class="first-paragraph" style="max-width:720px;">
+          <p style="color:#004396; margin:.6rem 0 0;">
+               Bonjour {{recipientFirstname}} {{recipientLastname}},
+          </p>
+
+          <p style="color:#004396; margin:.6rem 0;">
+               <strong>{{organizerFirstname}} {{organizerLastname}}</strong> vous a invité·e à participer à l'événement
+               <strong>{{eventTitle}}</strong>.
+          </p>
+     </div>
+
+     <div
+          style="background:#e6f0fa; padding:1rem 1.5rem; border-radius:8px; width:90%; max-width:640px; margin:0 auto; box-shadow:0 2px 8px rgba(0,67,150,0.05); text-align:left;">
+          <p style="color:#004396; margin:0 0 .5rem;">
+               <strong>Date :</strong> {{eventDate}} à {{eventTime}}
+          </p>
+          <p style="color:#004396; margin:0 0 .5rem;">
+               <strong>Lieu :</strong> {{eventLocation}}
+          </p>
+          <p style="color:#004396; margin:0 0 .5rem;">
+               <strong>Description :</strong><br>
+               {{eventDescription}}
+          </p>
+
+          <div style="text-align:center; margin-top:1rem;">
+
+               <a href="{{siteUrl}}auth/invitation"
+                    style="display:inline-block; background:#A3009C; color:#fff; padding:.7rem 1.5rem; border-radius:5px; text-decoration:none; font-weight:600;">
+                    Accéder à Evift
+               </a>
+          </div>
+     </div>
+
+     <p style="color:#004396; margin:0;">
+          Si vous ne souhaitez pas recevoir ce type d'invitation, vous pouvez ignorer ce message.
+     </p>
+</div>
+
+<style>
+     .body {
+          color: #004396;
+          word-wrap: break-word;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1.25rem;
+          font-family: Arial, Helvetica, sans-serif;
+          padding: 1rem 0;
+     }
+
+     .first-paragraph p {
+          margin: 0 0 0.5rem;
+     }
+
+     @media (max-width: 480px) {
+          .body {
+               gap: 1rem;
+               padding: .5rem 0;
+          }
+     }
+</style>
+
+{{{footer}}}

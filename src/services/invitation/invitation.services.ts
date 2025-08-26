@@ -1,3 +1,4 @@
+import { sendEmail } from "../../email/sendEmail";
 import { throwError } from "../../lib/utils/errorHandler/errorHandler";
 import { BaseService } from "../base.services";
 import { FriendsServices } from "../friends/friends.services";
@@ -32,15 +33,13 @@ export class InvitationServices extends BaseService {
       * and handles the case where a reverse invitation already exists by confirming it.
       * Otherwise, it creates a new invitation.
       */
-     public async invitationUser(id: string, userId: string) {
+     public async invitationUser(id: string, userId: string, firstnameUser: string, emailUser: string) {
 
-          // If User send invitation to himself
           if (id === userId) {
                throw throwError(400, "Vous ne pouvez pas vous inviter vous-même !");
           }
 
-          // Check user exist
-          await this.userServices.findUser(id);
+          const user = (await this.userServices.findUser(id))!;
 
           await this.friendsServices.checkAlreadyFriends(userId, id);
 
@@ -56,6 +55,11 @@ export class InvitationServices extends BaseService {
           }
 
           await this.createInvitation(userId, id);
+
+          await sendEmail(user.email, "", `Vous avez reçu une demande d'ami de ${firstnameUser} `, "invitation/friendInvitation", {
+               userFirstname: firstnameUser,
+               userEmail: emailUser
+          });
 
           return "Invitation envoyée !";
      }

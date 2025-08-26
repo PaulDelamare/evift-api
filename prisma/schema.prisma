@@ -34,7 +34,7 @@ model User {
   gifts               Gifts[]           @relation("gift")
   giftsTaken          Gifts[]           @relation("userTaken")
   bringItemsCreatedBy BringItem[]       @relation("createdBy")
-  taken               Taken[]           // Opposite relation for Taken.user
+  taken               Taken[]
   firstLogin          Boolean           @default(true)
   passwordResetToken PasswordResetToken[]
 }
