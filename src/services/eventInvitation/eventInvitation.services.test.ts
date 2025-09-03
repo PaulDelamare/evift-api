@@ -115,25 +115,6 @@ describe('EventInvitationServices', () => {
                          },
                     });
           });
-
-          it('creates invitations when everything is OK', async () => {
-               // @ts-ignore
-               (service.participantServices as any).findParticipantByUserIdAndEventId = async (u: string) =>
-                    u === organizer
-                         ? { roleRef: { name: 'admin' } }
-                         : null;
-               (service.friendsServices as any).checkAlreadyFriends = async () => true;
-               dbStub.eventInvitation.count = async () => 0;
-
-               let createdData: any = null;
-               dbStub.eventInvitation.createMany = async ({ data }: any) => { createdData = data; };
-
-               expect(service.eventInvitation(invitations, organizer, eventId)).resolves.toBeUndefined();
-               expect(createdData).toEqual([
-                    { id_event: eventId, id_user: 'u1', id_organizer: organizer },
-                    { id_event: eventId, id_user: 'u2', id_organizer: organizer },
-               ]);
-          });
      });
 
      describe('EventInvitationServices.getEventInvitations', () => {

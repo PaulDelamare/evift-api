@@ -76,8 +76,24 @@ describe('ParticipantServices.findParticipantByUserIdAndEventId', () => {
                               id_user: 'user-5678'
                          });
                          expect(params.include).toEqual({
-                              event: true,
-                              roleRef: true
+                              event: {
+                                   select: {
+                                        address: true,
+                                        date: true,
+                                        description: true,
+                                        name: true,
+                                        time: true,
+                                   },
+                              },
+                              roleRef: true,
+                              user: {
+                                   select: {
+                                        email: true,
+                                        firstname: true,
+                                        id: true,
+                                        lastname: true,
+                                   },
+                              },
                          });
 
                          return mockParticipant;
