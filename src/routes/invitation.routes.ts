@@ -119,7 +119,6 @@ export const invite = new Elysia({ prefix: "/invitation" })
 
                } catch (error) {
 
-                    console.log(error)
                     const { status, error: errorResponse } = handleError(error);
                     throw ctx.error(status, errorResponse);
                }

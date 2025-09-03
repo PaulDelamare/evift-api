@@ -67,7 +67,7 @@ export class RequestAccountServices extends BaseService {
 
           const token = generateToken();
 
-          await this.db.requestAccount.upsert({
+          const user = await this.db.requestAccount.upsert({
                where: { email },
                update: {
                     id_friend: updatedFriends,
@@ -81,7 +81,7 @@ export class RequestAccountServices extends BaseService {
                }
           });
 
-          await this.sendEmailAccount(email, token, id_friend, id_event);
+          await this.sendEmailAccount(email, user.token, id_friend, id_event);
      }
 
 
@@ -175,6 +175,13 @@ export class RequestAccountServices extends BaseService {
           };
 
           await sendEmail(newUser.email, process.env.EMAIL_SENDER!, 'Création d\'un compte Evift', 'validateEmail/validate-success', emailData);
+
+          await this.db.requestAccount.delete({
+               where: {
+                    email: body.email,
+                    token: body.token
+               }
+          });
      }
 
      public async checkRequestAccount(email: string, token: string, checkError: boolean) {

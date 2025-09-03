@@ -98,7 +98,7 @@ export class EventInvitationServices extends BaseService {
       * @param event - The event details, including name, date, time, address, and description.
       * @returns A Promise that resolves when all emails have been sent.
       */
-     private async sendNotificationToInviteuser(invitationsId: string[], user: Pick<User, 'id' | 'email' | 'firstname' | 'lastname'>, event: Pick<Event, 'name' | 'date' | 'time' | 'address' | 'description'>) {
+     private async sendNotificationToInviteuser(invitationsId: string[], org: Pick<User, 'id' | 'email' | 'firstname' | 'lastname'>, event: Pick<Event, 'name' | 'date' | 'time' | 'address' | 'description'>) {
           const users = await this.db.user.findMany({
                where: { id: { in: invitationsId } },
                select: { email: true, firstname: true, lastname: true }
@@ -110,8 +110,8 @@ export class EventInvitationServices extends BaseService {
                const emailData = {
                     recipientFirstname: user.firstname ?? "",
                     recipientLastname: user.lastname ?? "",
-                    organizerFirstname: user.firstname ?? "",
-                    organizerLastname: user.lastname ?? "",
+                    organizerFirstname: org.firstname ?? "",
+                    organizerLastname: org.lastname ?? "",
                     eventTitle: event?.name ?? "Événement Evift",
                     eventDate: formatDateWithoutTime(event?.date),
                     eventTime: event?.time,
@@ -238,7 +238,11 @@ export class EventInvitationServices extends BaseService {
           const participantRole = await this.roleEventServices.findRoleEvent("participant")
 
           if (response) {
-               await this.friendsServices.addFriends(userId, invitation.id_organizer);
+               const friends = await this.friendsServices.checkAlreadyFriends(userId, invitation.id_organizer, false);
+               if (!friends) {
+                    await this.friendsServices.addFriends(userId, invitation.id_organizer);
+               }
+
                await this.invitationServices.deleteByRequestId(invitation.id_user);
                await this.participantServices.addNewParticipant(eventId, userId, participantRole!.id);
           }
