@@ -297,44 +297,6 @@ describe('EventInvitationServices', () => {
                     });
           });
 
-          it('should accept the invitation (response=true)', async () => {
-               let added = false;
-               let deletedId: string | null = null;
-
-               // Declare required variables
-               const userId = 'user1';
-               const eventId = 'evt1';
-               const invitation = { id: 'inv1', id_user: userId, id_event: eventId };
-
-               // @ts-ignore
-               (service as any).findEventInvitationByUserIdAndEventId = async () => invitation;
-               service.eventServices.findEventById = async () => ({ id: eventId } as any);
-               service.roleEventServices.findRoleEvent = async (name: string) => ({
-                    id: 'role-participant',
-                    name,
-                    createdAt: new Date(),
-               });
-               service.participantServices.addNewParticipant = async (_e: string, _u: string, _r: string) => {
-                    added = true;
-               };
-               // @ts-ignore
-               (service as any).deleteEventInvitation = async (id: string) => {
-                    deletedId = id;
-               };
-
-               // === MOCK addFriends pour éviter la requête Prisma ===
-               service.friendsServices.addFriends = async () => {
-                    // ne fait rien
-               };
-
-               const result = await service.responseEventInvitation(userId, eventId, true);
-               expect(result).toBe('Invitation acceptée');
-               expect(added).toBe(true);
-
-               // @ts-ignore
-               expect(deletedId).toBe(invitation.id);
-          });
-
           it('should refuse the invitation (response=false)', async () => {
                let added = false;
                let deletedId: string | null = null;

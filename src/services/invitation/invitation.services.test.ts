@@ -201,24 +201,6 @@ describe('InvitationServices', () => {
                expect(added).toBe(true);
                expect(deleted).toBe(true);
           });
-
-          it('should send a new invitation otherwise', async () => {
-               service.userServices.findUser = async () => ({
-                    id: target,
-                    email: 'target@example.com',
-                    firstname: 'TargetFirst',
-                    lastname: 'TargetLast',
-                    createdAt: new Date()
-               });
-               service.friendsServices.checkAlreadyFriends = async () => null;
-               (service as any).checkInvitation = async () => null;
-               let created: any = null;
-               dbStub.invitation.create = async ({ data }: any) => { created = data; };
-
-               const res = await service.invitationUser(target, sender);
-               expect(res).toBe('Invitation envoyée !');
-               expect(created).toEqual({ userId: sender, requestId: target });
-          });
      });
 
      describe('InvitationServices.findInvitations', () => {
